@@ -1,0 +1,1 @@
+{"feetInset":10,"canvas":[400,320],"anims":{"idle":{"frames":20,"fps":10},"walk":{"frames":20,"fps":20},"attack":{"frames":5,"fps":12},"dash":{"frames":8,"fps":10},"hurt":{"frames":3,"fps":12},"knockdown":{"frames":6,"fps":10},"getUp":{"frames":5,"fps":10}}}

@@ -1,0 +1,134 @@
+{
+  "worldWidth": 6000,
+  "waveGapMs": 700,
+  "goBlinkMs": 180,
+  "stageClearDelayMs": 900,
+  "spawnMargin": 160,
+  "pickupReachX": 52,
+  "pickupReachY": 36,
+  "koScore": {
+    "punk": 100,
+    "rempit": 200,
+    "bruiser": 400,
+    "boss1": 2000
+  },
+  "backdrop": {
+    "far": "bg_far",
+    "farParallax": 0.22,
+    "farShiftY": 120,
+    "source": [1376, 768],
+    "skyCrop": 0.18,
+    "tileAbove": 1.4,
+    "cropBelow": 0.88,
+    "sections": {
+      "pasar": "bg_s1",
+      "shophouse": "bg_s2",
+      "alley": "bg_s3",
+      "underpass": "bg_s4",
+      "warehouse": "bg_boss"
+    },
+    "seam": { "post": 22, "lamp": 14 }
+  },
+  "pickupTypes": {
+    "tehTarik": { "label": "Teh Tarik", "color": "#e07a3d", "heal": 20, "full": false, "score": 0, "image": "tehtarik", "display": 84, "originX": 0.545, "originY": 0.838 },
+    "nasiLemak": { "label": "Nasi Lemak", "color": "#f2e2a8", "heal": 0, "full": true, "score": 0, "image": "nasilemak", "display": 85, "originX": 0.499, "originY": 0.805 },
+    "cash": { "label": "Cash", "color": "#3dba6a", "heal": 0, "full": false, "score": 500, "image": "cash", "display": 76, "originX": 0.498, "originY": 0.814 }
+  },
+  "breakableTypes": {
+    "crate": { "hp": 8, "w": 110, "h": 100, "hurtH": 180, "color": "#8a5a32", "image": "crate", "broken": "crate_broken", "display": 151, "originX": 0.499, "originY": 0.83, "brokenOriginX": 0.507, "brokenOriginY": 0.791 },
+    "bin": { "hp": 10, "w": 90, "h": 120, "hurtH": 190, "color": "#2f6b45", "image": "bin", "broken": "bin_broken", "display": 160, "originX": 0.499, "originY": 0.883, "brokenOriginX": 0.499, "brokenOriginY": 0.818 }
+  },
+  "sections": [
+    {
+      "id": "pasar",
+      "name": "Pasar Malam",
+      "triggerX": 900,
+      "ground": "#1a3d36",
+      "span": [0, 1750],
+      "waves": [
+        [
+          { "type": "punk", "side": "right", "y": 560 },
+          { "type": "punk", "side": "left", "y": 640 }
+        ],
+        [
+          { "type": "punk", "side": "right", "y": 520 },
+          { "type": "punk", "side": "left", "y": 680 }
+        ]
+      ]
+    },
+    {
+      "id": "shophouse",
+      "name": "Shophouse Row",
+      "triggerX": 2200,
+      "ground": "#2a2148",
+      "span": [1750, 3100],
+      "waves": [
+        [
+          { "type": "punk", "side": "left", "y": 560 },
+          { "type": "rempit", "side": "right", "y": 620 }
+        ],
+        [
+          { "type": "punk", "side": "right", "y": 520 },
+          { "type": "punk", "side": "left", "y": 680 },
+          { "type": "rempit", "side": "right", "y": 600 }
+        ]
+      ]
+    },
+    {
+      "id": "alley",
+      "name": "Back Alley",
+      "triggerX": 3600,
+      "ground": "#243040",
+      "span": [3100, 4300],
+      "waves": [
+        [
+          { "type": "bruiser", "side": "right", "y": 640 },
+          { "type": "punk", "side": "left", "y": 540 }
+        ],
+        [
+          { "type": "punk", "side": "right", "y": 560 },
+          { "type": "punk", "side": "left", "y": 660 }
+        ]
+      ]
+    },
+    {
+      "id": "underpass",
+      "name": "LRT Underpass",
+      "triggerX": 4800,
+      "ground": "#1c3048",
+      "span": [4300, 5300],
+      "waves": [
+        [
+          { "type": "rempit", "side": "right", "y": 580 },
+          { "type": "punk", "side": "left", "y": 520 },
+          { "type": "punk", "side": "right", "y": 680 }
+        ],
+        [
+          { "type": "bruiser", "side": "left", "y": 660 },
+          { "type": "rempit", "side": "right", "y": 560 }
+        ]
+      ]
+    },
+    {
+      "id": "warehouse",
+      "name": "Warehouse",
+      "triggerX": 5600,
+      "ground": "#3a2820",
+      "span": [5300, 6000],
+      "boss": "boss1",
+      "bossY": 620,
+      "backup": [
+        { "type": "punk", "side": "left", "y": 540 },
+        { "type": "punk", "side": "right", "y": 680 }
+      ],
+      "waves": []
+    }
+  ],
+  "breakables": [
+    { "type": "crate", "x": 700, "y": 600, "drop": "tehTarik" },
+    { "type": "bin", "x": 1600, "y": 640, "drop": "nasiLemak" },
+    { "type": "crate", "x": 2900, "y": 580, "drop": "cash" },
+    { "type": "bin", "x": 4000, "y": 620, "drop": "tehTarik" },
+    { "type": "crate", "x": 5300, "y": 600, "drop": "nasiLemak" }
+  ]
+}

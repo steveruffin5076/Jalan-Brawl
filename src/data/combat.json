@@ -1,0 +1,33 @@
+{
+  "depthLane": 24,
+  "comboBufferPortion": 0.4,
+  "comboResetMs": 500,
+  "comboDisplayMs": 1500,
+  "hitstopMs": 60,
+  "hitstopKnockdownMs": 90,
+  "flashMs": 50,
+  "shakeMs": 80,
+  "shakeIntensity": 0.004,
+  "knockdownZ": 450,
+  "lieMs": 800,
+  "getUpMs": 400,
+  "invulnMs": 1000,
+  "blinkMs": 80,
+  "gravity": 2200,
+  "chainKnockback": 220,
+  "sparkMs": 120,
+  "lives": 3,
+  "deadMs": 700,
+  "tokens": 2,
+  "waitMin": 400,
+  "waitMax": 1200,
+  "lineupEpsilon": 8,
+  "enemyBarMs": 1600,
+  "edgePad": 16,
+  "slots": [
+    { "x": -160, "y": -40 },
+    { "x": 160, "y": -40 },
+    { "x": -160, "y": 40 },
+    { "x": 160, "y": 40 }
+  ]
+}

@@ -1,0 +1,1 @@
+{"feetInset":10,"canvas":[440,340],"anims":{"idle":{"frames":20,"fps":8},"walk":{"frames":22,"fps":12},"combo":{"frames":10,"fps":12},"uppercut":{"frames":5,"fps":10},"lariat":{"frames":20,"fps":14},"call":{"frames":8,"fps":8},"hurt":{"frames":3,"fps":10},"knockdown":{"frames":7,"fps":8},"getUp":{"frames":5,"fps":8}}}
