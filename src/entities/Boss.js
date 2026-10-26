@@ -1,3 +1,4 @@
+import { attackDuration } from '../systems/HeroAnims.js';
 import Enemy from './Enemy.js';
 
 /** Towkay ignores the mob attack limit and runs his own combo and lariat. */
@@ -53,7 +54,7 @@ export default class Boss extends Enemy {
       }
     } else if (this.ai === 'attack') {
       this.attackElapsed += delta;
-      const duration = (this.attack.frames / this.attack.fps) * 1000;
+      const duration = attackDuration(this.attack);
       if (this.attackElapsed >= duration) this.finishCombo();
     } else if (this.ai === 'call') {
       this.state = 'idle';

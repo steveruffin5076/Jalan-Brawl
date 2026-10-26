@@ -16,39 +16,39 @@
     "combo": ["jab1", "jab2", "hook", "kick"],
     "attacks": {
       "jab1": {
-        "anim": "jab1", "frames": 5, "fps": 12, "damage": 4,
-        "activeFrames": [2, 3],
+        "anim": "jab1", "damage": 4,
+        "active": [0.4, 0.8],
         "hitbox": { "x": 66, "y": -196, "w": 56, "h": 52 },
         "knockdown": false, "hitstun": 250
       },
       "jab2": {
-        "anim": "jab2", "frames": 5, "fps": 20, "damage": 4,
-        "activeFrames": [1, 2, 3],
+        "anim": "jab2", "damage": 4,
+        "active": [0.2, 0.8],
         "hitbox": { "x": 70, "y": -198, "w": 64, "h": 50 },
         "knockdown": false, "hitstun": 250
       },
       "hook": {
-        "anim": "hook", "frames": 5, "fps": 12, "damage": 6,
-        "activeFrames": [2, 3],
+        "anim": "hook", "damage": 6,
+        "active": [0.4, 0.8],
         "hitbox": { "x": 72, "y": -214, "w": 66, "h": 60 },
         "knockdown": false, "hitstun": 300
       },
       "kick": {
-        "anim": "kick", "frames": 6, "fps": 12, "damage": 10,
-        "activeFrames": [1, 2, 3, 4],
+        "anim": "kick", "damage": 10,
+        "active": [0.1667, 0.8333],
         "hitbox": { "x": 42, "y": -184, "w": 84, "h": 68 },
         "knockdown": true, "knockback": 260
       },
       "jumpKick": {
-        "anim": "jumpKick", "frames": 5, "fps": 12, "damage": 12,
-        "activeFrames": [2, 3, 4],
+        "anim": "jumpKick", "damage": 12,
+        "active": [0.4, 1],
         "hitbox": { "x": 78, "y": -148, "w": 92, "h": 116 },
         "knockdown": true, "knockback": 220
       },
       "special": {
-        "anim": "special", "frames": 8, "fps": 12, "damage": 15,
-        "frameOrder": [0, 1, 2, 3, 4, 5, 6, 0],
-        "activeFrames": [2, 3, 4, 5, 6],
+        "anim": "special", "damage": 15,
+        "skipLast": true, "replayFirst": true,
+        "active": [0.25, 0.875],
         "hitbox": { "x": -48, "y": -200, "w": 224, "h": 165 },
         "knockdown": true, "knockback": 300, "hpCost": 8
       }
@@ -70,16 +70,16 @@
     },
     "attacks": {
       "punch1": {
-        "anim": "punch1", "clip": "attack", "frames": 5, "fps": 14, "damage": 6,
-        "frameOrder": [0, 1, 2, 3, 4],
-        "activeFrames": [1, 2],
+        "anim": "punch1", "clip": "attack", "damage": 6,
+        "span": [0, 0.5],
+        "active": [0.2, 0.6],
         "hitbox": { "x": 64, "y": -186, "w": 80, "h": 48 },
         "knockdown": false, "hitstun": 280
       },
       "punch2": {
-        "anim": "punch2", "clip": "attack", "frames": 5, "fps": 14, "damage": 8,
-        "frameOrder": [5, 6, 7, 8, 9],
-        "activeFrames": [2, 3],
+        "anim": "punch2", "clip": "attack", "damage": 8,
+        "span": [0.5, 1],
+        "active": [0.4, 0.8],
         "hitbox": { "x": 48, "y": -184, "w": 64, "h": 46 },
         "knockdown": false, "hitstun": 320
       }
@@ -93,7 +93,6 @@
     "attackRange": 240,
     "dashSpeed": 780,
     "telegraphMs": 400,
-    "dashIntroFrames": 7,
     "dashClip": "dash",
     "atlas": "rempit",
     "body": { "w": 72, "h": 200, "color": "#f08a2a" },
@@ -104,10 +103,9 @@
     },
     "attacks": {
       "dash": {
-        "anim": "dash", "frames": 1, "fps": 1, "damage": 12,
-        "holdFrame": 7,
-        "showFrames": [7],
-        "activeFrames": [0],
+        "anim": "dash", "damage": 12,
+        "holdEnd": true,
+        "active": [0, 1],
         "hitbox": { "x": 12, "y": -140, "w": 100, "h": 100 },
         "knockdown": true, "knockback": 280
       }
@@ -129,8 +127,8 @@
     },
     "attacks": {
       "slam": {
-        "anim": "slam", "frames": 10, "fps": 10, "damage": 16,
-        "activeFrames": [8],
+        "anim": "slam", "damage": 16,
+        "active": [0.8, 0.9],
         "hitbox": { "x": 42, "y": -190, "w": 116, "h": 110 },
         "knockdown": true, "knockback": 200, "hitstun": 400
       }
@@ -148,7 +146,6 @@
     "telegraphMs": 450,
     "backupAt": 0.5,
     "callMs": 1000,
-    "callFrames": 8,
     "atlas": "boss1",
     "body": { "w": 110, "h": 240, "color": "#9a3030" },
     "hurtbox": { "w": 136, "h": 240 },
@@ -158,29 +155,29 @@
     },
     "attacks": {
       "punch1": {
-        "anim": "punch1", "clip": "combo", "frames": 5, "fps": 12, "damage": 8,
-        "frameOrder": [0, 1, 2, 3, 4],
-        "activeFrames": [2, 3],
+        "anim": "punch1", "clip": "combo", "damage": 8,
+        "span": [0, 0.5],
+        "active": [0.4, 0.8],
         "hitbox": { "x": 48, "y": -210, "w": 84, "h": 56 },
         "knockdown": false, "hitstun": 280
       },
       "punch2": {
-        "anim": "punch2", "clip": "combo", "frames": 5, "fps": 12, "damage": 10,
-        "frameOrder": [5, 6, 7, 8, 9],
-        "activeFrames": [1, 2],
+        "anim": "punch2", "clip": "combo", "damage": 10,
+        "span": [0.5, 1],
+        "active": [0.2, 0.6],
         "hitbox": { "x": 56, "y": -206, "w": 92, "h": 52 },
         "knockdown": false, "hitstun": 300
       },
       "punch3": {
-        "anim": "uppercut", "frames": 5, "fps": 10, "damage": 16,
-        "activeFrames": [2, 3, 4],
+        "anim": "uppercut", "damage": 16,
+        "active": [0.4, 1],
         "hitbox": { "x": 16, "y": -286, "w": 86, "h": 130 },
         "knockdown": true, "knockback": 200, "hitstun": 360
       },
       "lariat": {
-        "anim": "lariat", "frames": 1, "fps": 1, "damage": 18,
+        "anim": "lariat", "damage": 18,
         "loopAnim": true,
-        "activeFrames": [0],
+        "active": [0, 1],
         "hitbox": { "x": 28, "y": -210, "w": 96, "h": 64 },
         "knockdown": true, "knockback": 340
       }

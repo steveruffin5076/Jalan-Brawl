@@ -64,11 +64,24 @@ function addPlate(scene, key, worldX, drawW, spec, scale, cropX) {
     cropLeft = Math.max(0, Math.round((sourceW - cropWidth) / 2));
     cropWidth = Math.min(cropWidth, sourceW - cropLeft);
   }
-  scene.add.image(worldX, DISPLAY.height, key)
+  // Phaser draws a crop inside the full frame. Scale from the crop size so the
+  // picture fills the section instead of leaving the skyline in the gap.
+  const image = scene.add.image(worldX, DISPLAY.height, key)
     .setOrigin(0, 1)
     .setDepth(-200)
     .setCrop(cropLeft, cropY, cropWidth, cropH)
-    .setDisplaySize(drawW, displayH);
+    .setScale(drawW / cropWidth, displayH / cropH);
+  image.x = worldX - cropLeft * image.scaleX;
+}
+
+/** Screen y where the painted street starts, plus a small step onto the road. */
+export function streetLine(spec) {
+  const sourceH = spec.source[1];
+  const scale = DISPLAY.height / sourceH;
+  const cropY = Math.round(sourceH * spec.skyCrop);
+  const streetY = Math.round(sourceH * spec.street);
+  const plateTop = DISPLAY.height - (sourceH - cropY) * scale;
+  return Math.ceil(plateTop + (streetY - cropY) * scale + spec.streetPad);
 }
 
 function drawSeams(scene, seams, spec) {

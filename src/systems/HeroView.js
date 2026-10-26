@@ -20,7 +20,8 @@ export default class HeroView {
     const pose = this.poseFor(fighter);
     this.show(pose.name, pose.index, pose.loop, fighter.hitstopMs > 0);
     const offsets = this.pose[pose.name];
-    this.sprite.x = poseOffset(offsets, this.sprite.anims.currentFrame);
+    const count = this.sprite.anims.currentAnim ? this.sprite.anims.currentAnim.frames.length : undefined;
+    this.sprite.x = poseOffset(offsets, this.sprite.anims.currentFrame, count);
     if (fighter.flashMs > 0) this.sprite.setTintFill(0xffffff);
     else this.sprite.clearTint();
   }

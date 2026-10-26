@@ -1,7 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { configFile, listPngs, loadConfig, newest, root } from './art-common.mjs';
+
+const toolFile = fileURLToPath(import.meta.url);
 
 const ALPHA = 20;
 const config = loadConfig();
@@ -55,7 +58,10 @@ async function processAnim(char, spec, anim, scale, canvasW, canvasH, feetInset,
   }
   const preview = path.join(outDir, `_preview_${anim}.png`);
   const inputs = [...frames, configFile(), scaleFile];
-  if (outputs.every((file) => fs.existsSync(file)) && fs.existsSync(preview) && newest([...outputs, preview]) >= newest(inputs)) {
+  if (anim === 'walk') inputs.push(toolFile);
+  const framesReady = outputs.every((file) => fs.existsSync(file)) && newest(outputs) >= newest(inputs);
+  const previewReady = fs.existsSync(preview) && newest([preview]) >= newest(outputs);
+  if (framesReady && previewReady) {
     console.log(`fresh ${char}/${anim} frames`);
     return;
   }
@@ -67,7 +73,8 @@ async function processAnim(char, spec, anim, scale, canvasW, canvasH, feetInset,
   for (const file of listPngs(outDir)) {
     if (path.basename(file).startsWith(`${char}_${anim}_`)) fs.unlinkSync(file);
   }
-  const placed = [];
+  const planted = anim === 'walk';
+  const prepared = [];
   for (let i = 0; i < chosen.length; i += 1) {
     const trimmed = await trimFrame(frames[chosen[i]]);
     // scaleMul: for clips made from a zoomed-out source image (e.g. bruiser slam)
@@ -78,11 +85,25 @@ async function processAnim(char, spec, anim, scale, canvasW, canvasH, feetInset,
       .resize(scaledW, scaledH, { fit: 'fill' })
       .png()
       .toBuffer();
-    // anchor "body" keeps the chest still between frames (stops walk wobble);
-    // default "feet" keeps the feet centre on the red line.
-    const anchorX = spec.anims[anim].anchor === 'body' ? trimmed.bodyX : trimmed.feetX;
-    const feetX = anchorX * (scaledW / trimmed.width);
-    const feetY = trimmed.feetY * (scaledH / trimmed.height);
+    const scaledRaw = await sharp(scaled).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    // Walk pins the stance (both shoes) on the spot. Each frame is trimmed on its
+    // own, so that point is placed directly and is not smoothed across frames.
+    // "body" keeps the chest still. The default keeps the feet centre on the line.
+    let anchorX = spec.anims[anim].anchor === 'body' ? trimmed.bodyX : trimmed.feetX;
+    if (planted) anchorX = stanceX(scaledRaw.data, scaledRaw.info.width, scaledRaw.info.height, scaledRaw.info.channels);
+    else anchorX *= scaledW / trimmed.width;
+    prepared.push({
+      scaled,
+      scaledW,
+      scaledH,
+      anchorX,
+      feetY: trimmed.feetY * (scaledH / trimmed.height)
+    });
+  }
+  const placed = [];
+  for (let i = 0; i < prepared.length; i += 1) {
+    const { scaled, scaledW, scaledH, anchorX, feetY } = prepared[i];
+    const feetX = anchorX;
     let destX = Math.round(canvasW / 2 - feetX);
     let destY = Math.round(canvasH - feetInset - feetY);
     let cropLeft = 0;
@@ -200,6 +221,33 @@ function findFeet(data, width, height, channels) {
   return { feetX, bodyX: bodyCount ? bodySum / bodyCount : feetX, feetY: lowest };
 }
 
+function stanceX(data, width, height, channels) {
+  let minY = height;
+  let maxY = -1;
+  for (let y = 0; y < height; y += 1) {
+    const row = y * width * channels;
+    for (let x = 0; x < width; x += 1) {
+      if (data[row + x * channels + 3] <= ALPHA) continue;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  }
+  if (maxY < 0) return width / 2;
+  const band = Math.max(2, Math.round((maxY - minY + 1) * 0.12));
+  const y0 = maxY - band + 1;
+  let sum = 0;
+  let count = 0;
+  for (let y = y0; y <= maxY; y += 1) {
+    const row = y * width * channels;
+    for (let x = 0; x < width; x += 1) {
+      if (data[row + x * channels + 3] <= ALPHA) continue;
+      sum += x;
+      count += 1;
+    }
+  }
+  return count ? sum / count : width / 2;
+}
+
 function pickIndices(files, want) {
   const count = files.length;
   const total = Math.min(want, count);
@@ -230,12 +278,14 @@ async function writePreview(frames, file, canvasW, canvasH, feetInset) {
   const overlay = Buffer.from(
     `<svg width="${sheetW}" height="${canvasH}" xmlns="http://www.w3.org/2000/svg">${lines}</svg>`
   );
-  await sharp({
+  const png = await sharp({
     create: {
       width: sheetW,
       height: canvasH,
       channels: 4,
       background: { r: 90, g: 94, b: 102, alpha: 1 }
     }
-  }).composite([...composites, { input: overlay, left: 0, top: 0 }]).png().toFile(file);
+  }).composite([...composites, { input: overlay, left: 0, top: 0 }]).png().toBuffer();
+  if (fs.existsSync(file)) fs.unlinkSync(file);
+  fs.writeFileSync(file, png);
 }

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { FLOOR, SHADOW, STAGE } from '../config.js';
+import { attackActive } from '../systems/HeroAnims.js';
 import HeroView from '../systems/HeroView.js';
 
 /**
@@ -185,12 +186,12 @@ export default class Fighter {
 
   attackFrame() {
     if (!this.attack) return -1;
-    const frameMs = 1000 / this.attack.fps;
-    return Math.min(this.attack.frames - 1, Math.floor(this.attackElapsed / frameMs));
+    const frameMs = 1000 / this.attack.playFps;
+    return Math.min(this.attack.playFrames - 1, Math.floor(this.attackElapsed / frameMs));
   }
 
   activeHitboxWorld() {
-    if (!this.attack || !this.attack.activeFrames.includes(this.attackFrame())) return null;
+    if (!this.attack || !attackActive(this.attack, this.attackElapsed)) return null;
     const box = this.attack.hitbox;
     const top = (this.y - this.z) + box.y;
     const left = this.facing === 1 ? this.x + box.x : this.x - box.x - box.w;

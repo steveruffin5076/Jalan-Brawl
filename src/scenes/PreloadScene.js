@@ -12,7 +12,7 @@ export default class PreloadScene extends Phaser.Scene {
 
   preload() {
     for (const char of atlasIndex) {
-      this.load.atlas(char, `assets/atlases/${char}.png`, `assets/atlases/${char}.json`);
+      this.load.multiatlas(char, `assets/atlases/${char}.json`, 'assets/atlases');
       this.load.json(`${char}Meta`, `assets/atlases/${char}.meta.json`);
     }
 
@@ -35,8 +35,7 @@ export default class PreloadScene extends Phaser.Scene {
     for (const char of atlasIndex) {
       const meta = this.cache.json.get(`${char}Meta`);
       if (!meta) continue;
-      const attacks = fighters[char] && fighters[char].attacks;
-      createFighterAnims(this.anims, char, meta, attacks || {});
+      createFighterAnims(this.anims, char, meta, fighters[char] || {});
     }
     this.scene.start('Title');
   }

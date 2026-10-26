@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { DISPLAY } from '../config.js';
 import fighters from '../data/fighters.json';
 import atlasIndex from '../data/atlas-index.json';
-import { frameNames, poseOffset, sequenceIndex } from '../systems/HeroAnims.js';
+import { bindFighter, poseOffset, sequenceIndex } from '../systems/HeroAnims.js';
 
 const FEET = { x: 640, y: 580 };
 const VIEW_SCALE = 1.5;
@@ -16,16 +16,13 @@ export default class AnimPreviewScene extends Phaser.Scene {
   preload() {
     this.chars = atlasIndex;
     for (const char of atlasIndex) {
-      this.load.image(`${char}Image`, `assets/atlases/${char}.png`);
-      this.load.json(`${char}Atlas`, `assets/atlases/${char}.json`);
+      this.load.multiatlas(char, `assets/atlases/${char}.json`, 'assets/atlases');
       this.load.json(`${char}Meta`, `assets/atlases/${char}.meta.json`);
     }
   }
 
   create() {
-    const ready = (this.chars || []).filter((char) => (
-      this.textures.exists(`${char}Image`) && this.cache.json.exists(`${char}Atlas`)
-    ));
+    const ready = (this.chars || []).filter((char) => this.textures.exists(char));
     if (!ready.length) {
       this.add.text(DISPLAY.width / 2, DISPLAY.height / 2, 'No atlas yet. Run npm run art.', {
         fontFamily: 'sans-serif',
@@ -35,8 +32,8 @@ export default class AnimPreviewScene extends Phaser.Scene {
       return;
     }
     for (const char of ready) {
-      const atlas = this.cache.json.get(`${char}Atlas`);
-      this.textures.addAtlas(char, this.textures.get(`${char}Image`).getSourceImage(), atlas);
+      const meta = this.cache.json.get(`${char}Meta`);
+      if (fighters[char] && meta) bindFighter(fighters[char], meta);
     }
     this.chars = ready;
     this.build();
@@ -93,6 +90,7 @@ export default class AnimPreviewScene extends Phaser.Scene {
     const total = this.sprite.anims.getTotalFrames();
     const index = sequenceIndex(this.sprite.anims.currentFrame);
     this.frameText.setText(`Frame ${index + 1} / ${total}`);
+    this.frameCount = total;
   }
 
   drawGrid() {
@@ -127,11 +125,7 @@ export default class AnimPreviewScene extends Phaser.Scene {
     const anim = names[this.animIndex];
     const meta = this.cache.json.get(`${char}Meta`);
     const spec = meta && meta.anims[anim] ? meta.anims[anim] : { frames: 1, fps: 8 };
-    const owners = clipAttacks(char, anim);
-    const sliced = owners.length === 1 && owners[0].frameOrder ? owners[0] : null;
-    const fps = owners.length === 1 ? previewFps(owners[0], spec) : spec.fps;
-    const frames = frameNames(char, anim, spec, sliced);
-    this.previewOrder = sliced ? sliced.frameOrder : null;
+    const frames = this.clipFrames(char, anim);
     this.currentAnim = anim;
     this.sprite.setTexture(char, frames[0]);
     const key = `${char}:${anim}`;
@@ -139,7 +133,7 @@ export default class AnimPreviewScene extends Phaser.Scene {
       this.anims.create({
         key,
         frames: frames.map((frame) => ({ key: char, frame })),
-        frameRate: fps,
+        frameRate: spec.fps,
         repeat: -1
       });
     }
@@ -154,7 +148,7 @@ export default class AnimPreviewScene extends Phaser.Scene {
   applyPose() {
     const char = this.chars[this.charIndex];
     const offsets = fighters[char] && fighters[char].pose && fighters[char].pose[this.currentAnim];
-    this.sprite.x = poseOffset(offsets, this.sprite.anims.currentFrame);
+    this.sprite.x = poseOffset(offsets, this.sprite.anims.currentFrame, this.frameCount);
   }
 
   drawOverlay() {
@@ -163,13 +157,23 @@ export default class AnimPreviewScene extends Phaser.Scene {
       this.overlay.lineStyle(2, 0x3dff6a, 1);
       this.overlay.strokeRect(-this.hurtbox.w / 2, -this.hurtbox.h, this.hurtbox.w, this.hurtbox.h);
     }
-    const played = sequenceIndex(this.sprite.anims.currentFrame);
-    const index = this.previewOrder ? this.previewOrder[played] : played;
+    const index = sequenceIndex(this.sprite.anims.currentFrame);
     const hit = attackForFrame(this.chars[this.charIndex], this.currentAnim, index);
     if (!hit) return;
     const box = hit.attack.hitbox;
     this.overlay.lineStyle(hit.active ? 4 : 2, 0xff4d4d, hit.active ? 1 : 0.45);
     this.overlay.strokeRect(box.x, box.y, box.w, box.h);
+  }
+
+  clipFrames(char, anim) {
+    const texture = this.textures.get(char);
+    const frames = [];
+    for (const name of texture.getFrameNames()) {
+      const match = name.match(new RegExp(`^${char}_${anim}_(\\d+)$`));
+      if (match) frames.push({ name, index: Number(match[1]) });
+    }
+    frames.sort((a, b) => a.index - b.index);
+    return frames.map((frame) => frame.name);
   }
 
   shiftAnim(step) {
@@ -231,25 +235,28 @@ function clipAttacks(char, anim) {
   return Object.values(stats.attacks).filter((attack) => (attack.clip || attack.anim) === anim);
 }
 
-function previewFps(attack, spec) {
-  if (attack.holdFrame != null || attack.loopAnim || attack.frameOrder) return spec.fps;
-  return attack.fps;
-}
-
 function attackForFrame(char, anim, frameIndex) {
   const list = clipAttacks(char, anim);
   for (const attack of list) {
-    if (!attack.frameOrder) continue;
-    const pos = attack.frameOrder.indexOf(frameIndex);
+    if (!attack.span && !attack.skipLast) continue;
+    const order = attack.playOrder || [];
+    const pos = order.indexOf(frameIndex);
     if (pos === -1) continue;
-    return { attack, active: attack.activeFrames.includes(pos) };
+    return { attack, active: frameInWindow(pos, order.length, attack.active) };
   }
-  const whole = list.find((attack) => !attack.frameOrder);
+  const whole = list.find((attack) => !attack.span && !attack.skipLast);
   if (!whole) return null;
-  if (whole.showFrames) {
-    if (!whole.showFrames.includes(frameIndex)) return null;
+  if (whole.holdEnd) {
+    if (frameIndex !== whole.holdFrame) return null;
     return { attack: whole, active: true };
   }
   if (whole.loopAnim) return { attack: whole, active: true };
-  return { attack: whole, active: whole.activeFrames.includes(frameIndex) };
+  return { attack: whole, active: frameInWindow(frameIndex, whole.playFrames || 1, whole.active) };
+}
+
+function frameInWindow(index, count, active) {
+  if (!active || count <= 0) return false;
+  const start = index / count;
+  const end = (index + 1) / count;
+  return end > active[0] && start < active[1];
 }

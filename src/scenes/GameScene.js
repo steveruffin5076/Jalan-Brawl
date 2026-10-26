@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DISPLAY, HERO_START, INPUT, STAGE } from '../config.js';
+import { DISPLAY, FLOOR, HERO_START, INPUT, STAGE } from '../config.js';
 import fighters from '../data/fighters.json';
 import combat from '../data/combat.json';
 import stage1 from '../data/stage1.json';
@@ -14,7 +14,7 @@ import CombatSystem from '../systems/CombatSystem.js';
 import AIDirector from '../systems/AIDirector.js';
 import WaveManager from '../systems/WaveManager.js';
 import { drawDebug } from '../systems/DebugDraw.js';
-import { createBackdrop, scrollBackdrop } from '../systems/StageBackdrop.js';
+import { createBackdrop, scrollBackdrop, streetLine } from '../systems/StageBackdrop.js';
 import TouchControls from '../ui/TouchControls.js';
 
 export default class GameScene extends Phaser.Scene {
@@ -39,6 +39,7 @@ export default class GameScene extends Phaser.Scene {
     this.registry.set('bossActive', false);
     this.registry.set('enemyName', '');
 
+    FLOOR.top = streetLine(stage1.backdrop);
     this.farLayer = createBackdrop(this, stage1);
     this.drawStreet();
 
@@ -47,7 +48,8 @@ export default class GameScene extends Phaser.Scene {
     this.fighters = [this.player];
     this.breakables = stage1.breakables.map((item) => {
       const spec = stage1.breakableTypes[item.type];
-      return new Breakable(this, item.x, item.y, spec, item.drop);
+      const y = Math.max(item.y, FLOOR.top);
+      return new Breakable(this, item.x, y, spec, item.drop);
     });
     this.pickups = [];
     this.director = new AIDirector(combat);
@@ -173,9 +175,10 @@ export default class GameScene extends Phaser.Scene {
     const left = scroll + STAGE.left;
     const right = scroll + STAGE.right;
     const x = spec.side === 'left' ? left - this.stage.spawnMargin : right + this.stage.spawnMargin;
+    const y = Math.max(spec.y, FLOOR.top);
     const enemy = spec.type === 'boss1'
-      ? new Boss(this, x, spec.y, stats, this.rules, spec.side || 'right')
-      : new Enemy(this, x, spec.y, stats, this.rules, spec.side || 'right');
+      ? new Boss(this, x, y, stats, this.rules, spec.side || 'right')
+      : new Enemy(this, x, y, stats, this.rules, spec.side || 'right');
     this.enemies.push(enemy);
     this.fighters.push(enemy);
   }

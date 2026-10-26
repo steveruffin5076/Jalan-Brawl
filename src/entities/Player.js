@@ -1,3 +1,4 @@
+import { attackDuration } from '../systems/HeroAnims.js';
 import Fighter from './Fighter.js';
 import { HERO_START } from '../config.js';
 
@@ -47,7 +48,7 @@ export default class Player extends Fighter {
     if (phase !== 'free') {
       // A tap during hitstop still counts if the combo window is already open.
       if (phase === 'frozen' && this.state === 'attack' && this.attack && input.attackPressed) {
-        const duration = (this.attack.frames / this.attack.fps) * 1000;
+        const duration = attackDuration(this.attack);
         if (this.attackElapsed >= duration * (1 - this.rules.comboBufferPortion)) {
           this.attackBuffered = true;
         }
@@ -115,7 +116,7 @@ export default class Player extends Fighter {
 
   advanceAttack(delta, input) {
     this.attackElapsed += delta;
-    const duration = (this.attack.frames / this.attack.fps) * 1000;
+    const duration = attackDuration(this.attack);
     const bufferAt = duration * (1 - this.rules.comboBufferPortion);
     if (this.state === 'attack' && input.attackPressed && this.attackElapsed >= bufferAt) {
       this.attackBuffered = true;

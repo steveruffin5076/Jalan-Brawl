@@ -18,6 +18,8 @@
     "farShiftY": 120,
     "source": [1376, 768],
     "skyCrop": 0.18,
+    "street": 0.78,
+    "streetPad": 16,
     "tileAbove": 1.4,
     "cropBelow": 0.88,
     "sections": {
@@ -47,12 +49,12 @@
       "span": [0, 1750],
       "waves": [
         [
-          { "type": "punk", "side": "right", "y": 560 },
-          { "type": "punk", "side": "left", "y": 640 }
+          { "type": "punk", "side": "right", "y": 618 },
+          { "type": "punk", "side": "left", "y": 674 }
         ],
         [
-          { "type": "punk", "side": "right", "y": 520 },
-          { "type": "punk", "side": "left", "y": 680 }
+          { "type": "punk", "side": "right", "y": 590 },
+          { "type": "punk", "side": "left", "y": 695 }
         ]
       ]
     },
@@ -64,13 +66,13 @@
       "span": [1750, 3100],
       "waves": [
         [
-          { "type": "punk", "side": "left", "y": 560 },
-          { "type": "rempit", "side": "right", "y": 620 }
+          { "type": "punk", "side": "left", "y": 618 },
+          { "type": "rempit", "side": "right", "y": 660 }
         ],
         [
-          { "type": "punk", "side": "right", "y": 520 },
-          { "type": "punk", "side": "left", "y": 680 },
-          { "type": "rempit", "side": "right", "y": 600 }
+          { "type": "punk", "side": "right", "y": 590 },
+          { "type": "punk", "side": "left", "y": 695 },
+          { "type": "rempit", "side": "right", "y": 646 }
         ]
       ]
     },
@@ -82,12 +84,12 @@
       "span": [3100, 4300],
       "waves": [
         [
-          { "type": "bruiser", "side": "right", "y": 640 },
-          { "type": "punk", "side": "left", "y": 540 }
+          { "type": "bruiser", "side": "right", "y": 674 },
+          { "type": "punk", "side": "left", "y": 604 }
         ],
         [
-          { "type": "punk", "side": "right", "y": 560 },
-          { "type": "punk", "side": "left", "y": 660 }
+          { "type": "punk", "side": "right", "y": 618 },
+          { "type": "punk", "side": "left", "y": 688 }
         ]
       ]
     },
@@ -99,13 +101,13 @@
       "span": [4300, 5300],
       "waves": [
         [
-          { "type": "rempit", "side": "right", "y": 580 },
-          { "type": "punk", "side": "left", "y": 520 },
-          { "type": "punk", "side": "right", "y": 680 }
+          { "type": "rempit", "side": "right", "y": 632 },
+          { "type": "punk", "side": "left", "y": 590 },
+          { "type": "punk", "side": "right", "y": 695 }
         ],
         [
-          { "type": "bruiser", "side": "left", "y": 660 },
-          { "type": "rempit", "side": "right", "y": 560 }
+          { "type": "bruiser", "side": "left", "y": 688 },
+          { "type": "rempit", "side": "right", "y": 618 }
         ]
       ]
     },
@@ -116,10 +118,10 @@
       "ground": "#3a2820",
       "span": [5300, 6000],
       "boss": "boss1",
-      "bossY": 620,
+      "bossY": 660,
       "backup": [
-        { "type": "punk", "side": "left", "y": 540 },
-        { "type": "punk", "side": "right", "y": 680 }
+        { "type": "punk", "side": "left", "y": 604 },
+        { "type": "punk", "side": "right", "y": 695 }
       ],
       "waves": []
     }
@@ -127,7 +129,7 @@
   "breakables": [
     { "type": "crate", "x": 700, "y": 600, "drop": "tehTarik" },
     { "type": "bin", "x": 1600, "y": 640, "drop": "nasiLemak" },
-    { "type": "crate", "x": 2900, "y": 580, "drop": "cash" },
+    { "type": "crate", "x": 2900, "y": 620, "drop": "cash" },
     { "type": "bin", "x": 4000, "y": 620, "drop": "tehTarik" },
     { "type": "crate", "x": 5300, "y": 600, "drop": "nasiLemak" }
   ]

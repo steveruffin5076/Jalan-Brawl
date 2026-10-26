@@ -1,3 +1,4 @@
+import { attackDuration } from '../systems/HeroAnims.js';
 import Fighter from './Fighter.js';
 import { STAGE } from '../config.js';
 
@@ -83,7 +84,7 @@ export default class Enemy extends Fighter {
       if (this.state === 'attack') this.ai = 'attack';
     } else if (this.ai === 'attack') {
       this.attackElapsed += delta;
-      const duration = (this.attack.frames / this.attack.fps) * 1000;
+      const duration = attackDuration(this.attack);
       if (this.attackElapsed >= duration) this.finishSwing(director);
     } else if (this.ai === 'telegraph') {
       this.state = 'idle';
