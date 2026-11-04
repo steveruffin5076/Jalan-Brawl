@@ -1,0 +1,39 @@
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#game-container {
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+#rotate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #111;
+  color: #fff;
+  font-family: sans-serif;
+  text-align: center;
+  padding: 24px;
+}
+
+#rotate-overlay[hidden] {
+  display: none;
+}
+
+#rotate-overlay p {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.3;
+}
