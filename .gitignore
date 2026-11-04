@@ -9,3 +9,11 @@ dist-ssr
 .idea
 .vscode/*
 !.vscode/extensions.json
+
+# Local scratch / extracted kits (not source)
+_backup_pivotfix/
+_besi_splash_new/
+_tmp_besi_splash/
+
+# Generated art pipeline output (rebuild with npm run art)
+art/frames/
