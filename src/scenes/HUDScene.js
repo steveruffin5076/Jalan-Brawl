@@ -19,6 +19,10 @@ export default class HUDScene extends Phaser.Scene {
     this.livesText = label(32, 72, '', 18);
     this.scoreText = label(350, 72, '', 18).setOrigin(1, 0);
     this.comboText = label(32, 116, '', 25, '#ffcf70');
+    this.bonusText = label(32, 207, '', 20, '#ffcf70');
+    this.boostText = label(32, 235, '', 20, '#ffcf70');
+    this.lastComboBonus = null;
+    this.bonusMs = 0;
 
     this.enemyName = label(32, 153, '', 18);
     this.enemyBack = this.pin(this.add.rectangle(32, 184, 180, 10, 0x301e1b).setOrigin(0, 0.5).setStrokeStyle(1, 0x9f8054));
@@ -48,7 +52,7 @@ export default class HUDScene extends Phaser.Scene {
     this.enemyFill.setVisible(false);
   }
 
-  update() {
+  update(_time, delta) {
     const hp = this.registry.get('playerHp') ?? 0;
     const maxHp = this.registry.get('playerMaxHp') || 1;
     this.hpFill.scaleX = Phaser.Math.Clamp(hp / maxHp, 0, 1);
@@ -57,6 +61,18 @@ export default class HUDScene extends Phaser.Scene {
     this.scoreText.setText(`Score ${this.registry.get('score') || 0}`);
     const combo = this.registry.get('combo') || 0;
     this.comboText.setText(combo > 0 ? `${combo} HITS!` : '');
+    const boostSeconds = this.registry.get('attackBoostSeconds') || 0;
+    this.boostText.setText(boostSeconds > 0 ? `ATK +10%  ${boostSeconds}s` : '');
+    const bonus = this.registry.get('comboBonus');
+    if (bonus && bonus !== this.lastComboBonus) {
+      this.lastComboBonus = bonus;
+      this.bonusMs = 1500;
+      this.bonusText.setText(`COMBO BONUS +${bonus.amount}`);
+    }
+    if (this.bonusMs > 0) {
+      this.bonusMs = Math.max(0, this.bonusMs - delta);
+      if (this.bonusMs === 0) this.bonusText.setText('');
+    }
 
     const bossOn = !!this.registry.get('bossActive');
     this.bossFrame.setVisible(bossOn);

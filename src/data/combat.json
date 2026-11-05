@@ -4,6 +4,8 @@
   "comboBufferPortion": 0.4,
   "comboResetMs": 500,
   "comboDisplayMs": 1500,
+  "comboBonuses": { "3": 50, "4": 100, "6": 200 },
+  "attackBoost": { "triggerHits": 4, "multiplier": 1.1, "durationMs": 5000 },
   "hitstopMs": 60,
   "hitstopKnockdownMs": 90,
   "flashMs": 50,

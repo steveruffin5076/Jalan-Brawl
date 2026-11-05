@@ -13,6 +13,7 @@ import InputManager from '../systems/InputManager.js';
 import { depthSort } from '../systems/DepthSort.js';
 import CombatSystem from '../systems/CombatSystem.js';
 import CombatAudio from '../systems/CombatAudio.js';
+import AttackBoost from '../systems/AttackBoost.js';
 import { awardEnemyKO } from '../systems/EnemyDrops.js';
 import GameplayAudio from '../systems/GameplayAudio.js';
 import SceneAudio from '../systems/SceneAudio.js';
@@ -21,6 +22,7 @@ import WaveManager from '../systems/WaveManager.js';
 import { drawDebug } from '../systems/DebugDraw.js';
 import { createBackdrop, scrollBackdrop, streetLine } from '../systems/StageBackdrop.js';
 import TouchControls from '../ui/TouchControls.js';
+import AreaBanner from '../ui/AreaBanner.js';
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -44,14 +46,16 @@ export default class GameScene extends Phaser.Scene {
     this.registry.set('score', 0);
     this.registry.set('maxCombo', 0);
     this.registry.set('combo', 0);
+    this.registry.set('comboBonus', null);
     this.registry.set('bossActive', false);
     this.registry.set('enemyName', '');
 
     FLOOR.top = streetLine(stage1.backdrop);
     this.farLayer = createBackdrop(this, stage1);
-    this.drawStreet();
+    this.areaBanner = new AreaBanner(this, stage1.sections);
 
     this.player = new Player(this, HERO_START.x, HERO_START.y, fighters.hero, combat);
+    this.areaBanner.update(0, this.player.x);
     this.lastPlayerSwing = null;
     this.enemies = [];
     this.fighters = [this.player];
@@ -63,6 +67,7 @@ export default class GameScene extends Phaser.Scene {
     this.pickups = [];
     this.director = new AIDirector(combat);
     this.combatAudio = new CombatAudio(this.sound);
+    this.attackBoost = new AttackBoost(combat.attackBoost, this.registry);
     this.gameplayAudio = new GameplayAudio(this.sound);
     this.combat = new CombatSystem(this, combat);
     this.flow = new WaveManager(stage1, {
@@ -110,16 +115,6 @@ export default class GameScene extends Phaser.Scene {
     depthSort(this.fighters);
   }
 
-  drawStreet() {
-    for (const section of this.stage.sections) {
-      this.add.text(section.triggerX - 360, 168, section.name, {
-        fontFamily: 'sans-serif',
-        fontSize: '42px',
-        color: '#f4f1e8'
-      }).setOrigin(0, 0.5).setDepth(-40).setAlpha(0.9);
-    }
-  }
-
   update(_time, deltaMs) {
     const delta = Math.min(deltaMs, INPUT.maxDeltaMs);
     if (Phaser.Input.Keyboard.JustDown(this.f1)) this.debugOn = !this.debugOn;
@@ -144,11 +139,15 @@ export default class GameScene extends Phaser.Scene {
     const playerWasLying = this.player.lying;
     const playerBefore = { state: this.player.state, z: this.player.z };
     this.player.update(delta, input);
+    if (this.player.state === 'dead' || this.player.leaving) this.attackBoost.clear();
+    else this.attackBoost.tick(delta);
+    this.areaBanner.update(delta, this.player.x);
     this.gameplayAudio.movement(playerBefore, this.player);
     this.combatAudio.landing(this.player, playerWasLying);
     this.playPlayerSwing();
     if (this.player.leaving) return;
     this.combat.update(delta, this.fighters, this.breakables);
+    if (this.player.state === 'dead') this.attackBoost.clear();
     this.director.reap(this.enemies);
     for (const prop of this.breakables) prop.tick(delta);
     for (const pickup of this.pickups) {
