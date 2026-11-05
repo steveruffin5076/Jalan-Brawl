@@ -11,6 +11,8 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.image('menuBackground', 'assets/backgrounds/menu-background.png');
+
     for (const char of atlasIndex) {
       this.load.multiatlas(char, `assets/atlases/${char}.json`, 'assets/atlases');
       this.load.json(`${char}Meta`, `assets/atlases/${char}.meta.json`);

@@ -9,6 +9,10 @@ export default class TitleScene extends Phaser.Scene {
   create() {
     const { width, height } = DISPLAY;
 
+    // Cover the display without stretching the artwork.
+    const background = this.add.image(width / 2, height / 2, 'menuBackground');
+    background.setScale(Math.max(width / background.width, height / background.height));
+
     this.add.text(width / 2, 150, 'Jalan Brawl', {
       fontFamily: 'sans-serif',
       fontSize: '64px',
@@ -20,13 +24,6 @@ export default class TitleScene extends Phaser.Scene {
       fontSize: '28px',
       color: '#9eb0c8'
     }).setOrigin(0.5);
-
-    // A circle stays round only when FIT scales both axes equally.
-    const marker = this.add.graphics();
-    marker.lineStyle(6, 0xf4f1e8, 1);
-    marker.strokeCircle(width / 2, 340, 70);
-    marker.lineStyle(2, 0x3d8bfd, 1);
-    marker.strokeRect(8, 8, width - 16, height - 16);
 
     this.makeButton(width / 2, 500, 'Start', () => {
       this.scene.start('Game');
