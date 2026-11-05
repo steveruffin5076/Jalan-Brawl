@@ -11,6 +11,7 @@ import Pickup from '../entities/Pickup.js';
 import InputManager from '../systems/InputManager.js';
 import { depthSort } from '../systems/DepthSort.js';
 import CombatSystem from '../systems/CombatSystem.js';
+import CombatAudio from '../systems/CombatAudio.js';
 import AIDirector from '../systems/AIDirector.js';
 import WaveManager from '../systems/WaveManager.js';
 import { drawDebug } from '../systems/DebugDraw.js';
@@ -54,6 +55,7 @@ export default class GameScene extends Phaser.Scene {
     });
     this.pickups = [];
     this.director = new AIDirector(combat);
+    this.combatAudio = new CombatAudio(this.sound);
     this.combat = new CombatSystem(this, combat);
     this.flow = new WaveManager(stage1, {
       spawn: (spec) => this.spawnFighter(spec),
@@ -124,9 +126,16 @@ export default class GameScene extends Phaser.Scene {
     this.applyCamera();
     this.director.reap(this.enemies);
     for (const enemy of this.enemies) {
-      if (!enemy.removed) enemy.update(delta, this.director, this.player);
+      if (enemy.removed) continue;
+      const previousAI = enemy.ai;
+      const wasLying = enemy.lying;
+      enemy.update(delta, this.director, this.player);
+      this.combatAudio.enemyUpdate(enemy, previousAI);
+      this.combatAudio.landing(enemy, wasLying);
     }
+    const playerWasLying = this.player.lying;
     this.player.update(delta, input);
+    this.combatAudio.landing(this.player, playerWasLying);
     this.playPlayerSwing();
     if (this.player.leaving) return;
     this.combat.update(delta, this.fighters, this.breakables);

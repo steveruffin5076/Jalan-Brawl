@@ -44,6 +44,7 @@ export default class CombatSystem {
 
     attacker.hitSet.add(target);
     attacker.attackConnected = true;
+    this.scene.combatAudio.hit(attacker);
     target.hp = Math.max(0, target.hp - attacker.attack.damage);
     target.flashMs = this.rules.flashMs;
     this.paySpecial(attacker);
@@ -88,6 +89,7 @@ export default class CombatSystem {
     attacker.attackConnected = true;
     this.paySpecial(attacker);
     prop.hurt(attacker.attack.damage);
+    if (prop.broken) this.scene.combatAudio.breakProp(prop);
     this.spark(overlapCenter(hitbox, hurt));
   }
 
