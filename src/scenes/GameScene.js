@@ -16,6 +16,7 @@ import CombatAudio from '../systems/CombatAudio.js';
 import AttackBoost from '../systems/AttackBoost.js';
 import { awardEnemyKO } from '../systems/EnemyDrops.js';
 import GameplayAudio from '../systems/GameplayAudio.js';
+import { fasterMovement, fasterCombat } from '../systems/GameplayPace.js';
 import SceneAudio from '../systems/SceneAudio.js';
 import AIDirector from '../systems/AIDirector.js';
 import WaveManager from '../systems/WaveManager.js';
@@ -30,7 +31,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.rules = combat;
+    this.rules = fasterCombat(combat);
     this.stage = stage1;
     this.score = 0;
     this.timeMs = 0;
@@ -54,7 +55,7 @@ export default class GameScene extends Phaser.Scene {
     this.farLayer = createBackdrop(this, stage1);
     this.areaBanner = new AreaBanner(this, stage1.sections);
 
-    this.player = new Player(this, HERO_START.x, HERO_START.y, fighters.hero, combat);
+    this.player = new Player(this, HERO_START.x, HERO_START.y, fasterMovement(fighters.hero), this.rules);
     this.areaBanner.update(0, this.player.x);
     this.lastPlayerSwing = null;
     this.enemies = [];
@@ -65,11 +66,11 @@ export default class GameScene extends Phaser.Scene {
       return new Breakable(this, item.x, y, spec, item.drop);
     });
     this.pickups = [];
-    this.director = new AIDirector(combat);
+    this.director = new AIDirector(this.rules);
     this.combatAudio = new CombatAudio(this.sound);
     this.attackBoost = new AttackBoost(combat.attackBoost, this.registry);
     this.gameplayAudio = new GameplayAudio(this.sound);
-    this.combat = new CombatSystem(this, combat);
+    this.combat = new CombatSystem(this, this.rules);
     this.flow = new WaveManager(stage1, {
       spawn: (spec) => this.spawnFighter(spec),
       alive: () => this.enemies.some((enemy) => enemy.state !== 'dead' && !enemy.removed),
@@ -208,7 +209,7 @@ export default class GameScene extends Phaser.Scene {
 
   spawnFighter(spec) {
     if (spec.type === 'boss1') this.backgroundAudio.setMusic('bossMusic');
-    const stats = { ...fighters[spec.type], kind: spec.type };
+    const stats = { ...fasterMovement(fighters[spec.type]), kind: spec.type };
     const scroll = this.flow.lockScroll;
     const left = scroll + STAGE.left;
     const right = scroll + STAGE.right;
