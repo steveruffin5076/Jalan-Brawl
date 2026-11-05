@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { DISPLAY } from '../config.js';
+import SceneAudio from '../systems/SceneAudio.js';
+import { wireMenuSounds } from '../ui/MenuSounds.js';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -8,6 +10,8 @@ export default class TitleScene extends Phaser.Scene {
 
   create() {
     const { width, height } = DISPLAY;
+    this.backgroundAudio = new SceneAudio(this);
+    this.backgroundAudio.setMusic('menuMusic');
 
     // Cover the display without stretching the artwork.
     const background = this.add.image(width / 2, height / 2, 'menuBackground');
@@ -58,9 +62,7 @@ export default class TitleScene extends Phaser.Scene {
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    bg.on('pointerover', () => bg.setFillStyle(0x2a5080));
-    bg.on('pointerout', () => bg.setFillStyle(0x1e3a5f));
-    bg.on('pointerdown', onPress);
+    wireMenuSounds(this, bg, onPress);
 
     return text;
   }

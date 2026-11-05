@@ -11,6 +11,13 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.audio('menuMusic', 'assets/audio/music/menu.mp3');
+    this.load.audio('stageMusic', 'assets/audio/music/stage.mp3');
+    this.load.audio('bossMusic', 'assets/audio/music/boss.mp3');
+    this.load.audio('streetAmbience', 'assets/audio/music/ambience.mp3');
+    this.load.audio('menuHover', 'assets/audio/menu/hover.mp3');
+    this.load.audio('menuConfirm', 'assets/audio/menu/confirm.mp3');
+
     for (const name of ['jab', 'hook', 'kick', 'jump-kick', 'special']) {
       this.load.audio(`heroSwing-${name}`, `assets/audio/hero/${name}.mp3`);
     }

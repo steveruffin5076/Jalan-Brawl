@@ -12,6 +12,7 @@ import InputManager from '../systems/InputManager.js';
 import { depthSort } from '../systems/DepthSort.js';
 import CombatSystem from '../systems/CombatSystem.js';
 import CombatAudio from '../systems/CombatAudio.js';
+import SceneAudio from '../systems/SceneAudio.js';
 import AIDirector from '../systems/AIDirector.js';
 import WaveManager from '../systems/WaveManager.js';
 import { drawDebug } from '../systems/DebugDraw.js';
@@ -33,6 +34,9 @@ export default class GameScene extends Phaser.Scene {
     this.clearStarted = false;
     this.goBlink = 0;
     this.goOn = true;
+    this.backgroundAudio = new SceneAudio(this);
+    this.backgroundAudio.setMusic('stageMusic');
+    this.backgroundAudio.startAmbience();
 
     this.registry.set('score', 0);
     this.registry.set('maxCombo', 0);
@@ -194,6 +198,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   spawnFighter(spec) {
+    if (spec.type === 'boss1') this.backgroundAudio.setMusic('bossMusic');
     const stats = { ...fighters[spec.type], kind: spec.type };
     const scroll = this.flow.lockScroll;
     const left = scroll + STAGE.left;
