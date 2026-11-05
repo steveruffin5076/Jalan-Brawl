@@ -14,6 +14,7 @@ import { depthSort } from '../systems/DepthSort.js';
 import CombatSystem from '../systems/CombatSystem.js';
 import CombatAudio from '../systems/CombatAudio.js';
 import AttackBoost from '../systems/AttackBoost.js';
+import FlyingKick from '../systems/FlyingKick.js';
 import { awardEnemyKO } from '../systems/EnemyDrops.js';
 import GameplayAudio from '../systems/GameplayAudio.js';
 import { fasterMovement, fasterCombat } from '../systems/GameplayPace.js';
@@ -56,6 +57,7 @@ export default class GameScene extends Phaser.Scene {
     this.areaBanner = new AreaBanner(this, stage1.sections);
 
     this.player = new Player(this, HERO_START.x, HERO_START.y, fasterMovement(fighters.hero), this.rules);
+    this.flyingKick = new FlyingKick();
     this.areaBanner.update(0, this.player.x);
     this.lastPlayerSwing = null;
     this.enemies = [];
@@ -139,7 +141,9 @@ export default class GameScene extends Phaser.Scene {
     }
     const playerWasLying = this.player.lying;
     const playerBefore = { state: this.player.state, z: this.player.z };
+    const playerWasFrozen = this.player.hitstopMs > 0;
     this.player.update(delta, input);
+    this.flyingKick.update(this.player, delta, playerWasFrozen);
     if (this.player.state === 'dead' || this.player.leaving) this.attackBoost.clear();
     else this.attackBoost.tick(delta);
     this.areaBanner.update(delta, this.player.x);
