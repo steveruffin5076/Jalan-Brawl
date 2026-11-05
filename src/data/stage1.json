@@ -1,5 +1,5 @@
 {
-  "worldWidth": 6000,
+  "worldWidth": 6580,
   "waveGapMs": 700,
   "goBlinkMs": 180,
   "stageClearDelayMs": 900,
@@ -114,9 +114,10 @@
     {
       "id": "warehouse",
       "name": "Warehouse",
-      "triggerX": 5600,
+      "triggerX": 5940,
       "ground": "#3a2820",
-      "span": [5300, 6000],
+      "span": [5300, 6580],
+      "skyCrop": 0,
       "boss": "boss1",
       "bossY": 660,
       "backup": [
