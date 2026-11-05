@@ -11,6 +11,10 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    for (const name of ['jab', 'hook', 'kick', 'jump-kick', 'special']) {
+      this.load.audio(`heroSwing-${name}`, `assets/audio/hero/${name}.mp3`);
+    }
+
     this.load.image('menuBackground', 'assets/backgrounds/menu-background.png');
 
     for (const char of atlasIndex) {

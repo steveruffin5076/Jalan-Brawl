@@ -44,6 +44,7 @@ export default class GameScene extends Phaser.Scene {
     this.drawStreet();
 
     this.player = new Player(this, HERO_START.x, HERO_START.y, fighters.hero, combat);
+    this.lastPlayerSwing = null;
     this.enemies = [];
     this.fighters = [this.player];
     this.breakables = stage1.breakables.map((item) => {
@@ -126,6 +127,7 @@ export default class GameScene extends Phaser.Scene {
       if (!enemy.removed) enemy.update(delta, this.director, this.player);
     }
     this.player.update(delta, input);
+    this.playPlayerSwing();
     if (this.player.leaving) return;
     this.combat.update(delta, this.fighters, this.breakables);
     this.director.reap(this.enemies);
@@ -146,6 +148,19 @@ export default class GameScene extends Phaser.Scene {
     this.tickGo(delta);
     depthSort(this.fighters);
     drawDebug(this.debugGfx, this.fighters, this.rules, this.debugOn, this.breakables);
+  }
+
+  playPlayerSwing() {
+    const attack = this.player.attack;
+    if (attack && attack !== this.lastPlayerSwing) {
+      const sounds = {
+        jab1: 'jab', jab2: 'jab', hook: 'hook', kick: 'kick',
+        jumpKick: 'jump-kick', special: 'special'
+      };
+      const sound = sounds[attack.anim];
+      if (sound) this.sound.play(`heroSwing-${sound}`, { volume: 0.7 });
+    }
+    this.lastPlayerSwing = attack;
   }
 
   applyCamera() {
