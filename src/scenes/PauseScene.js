@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { wireMenuSounds } from '../ui/MenuSounds.js';
+import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
 import { DISPLAY, UI } from '../config.js';
 
 export default class PauseScene extends Phaser.Scene {
@@ -17,9 +18,13 @@ export default class PauseScene extends Phaser.Scene {
       color: '#f4f1e8'
     }).setOrigin(0.5);
 
-    this.makeButton(center, 340, 'Resume', () => this.resumeGame());
-    this.makeButton(center, 440, 'Restart', () => this.leave('Game'));
-    this.makeButton(center, 540, 'Quit', () => this.leave('Title'));
+    this.audioPanel = null;
+    this.makeButton(center, 300, 'Resume', () => this.resumeGame());
+    this.makeButton(center, 390, 'Audio Settings', () => {
+      if (!this.audioPanel) this.audioPanel = new AudioSettingsPanel(this, () => { this.audioPanel = null; });
+    });
+    this.makeButton(center, 480, 'Restart', () => this.leave('Game'));
+    this.makeButton(center, 570, 'Quit', () => this.leave('Title'));
 
     this.esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
@@ -33,6 +38,10 @@ export default class PauseScene extends Phaser.Scene {
     }
     const esc = Phaser.Input.Keyboard.JustDown(this.esc);
     const pause = Phaser.Input.Keyboard.JustDown(this.pauseKey);
+    if (this.audioPanel) {
+      if (esc || pause) this.audioPanel.close();
+      return;
+    }
     if (esc || pause) this.resumeGame();
   }
 

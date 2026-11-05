@@ -1,3 +1,4 @@
+import { audioSettings } from './AudioSettings.js';
 import { attackDuration } from './HeroAnims.js';
 
 /** Sound cues follow combat events, without changing fighter state or animations. */
@@ -9,7 +10,7 @@ export default class CombatAudio {
   }
 
   play(name) {
-    this.sound.play(`combat-${name}`, { volume: 0.7 });
+    this.sound.play(`combat-${name}`, { volume: 0.7 * audioSettings.values.effects });
   }
 
   hit(attacker) {

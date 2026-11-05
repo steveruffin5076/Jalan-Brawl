@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { DISPLAY } from '../config.js';
 import SceneAudio from '../systems/SceneAudio.js';
 import { wireMenuSounds } from '../ui/MenuSounds.js';
+import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -29,11 +30,16 @@ export default class TitleScene extends Phaser.Scene {
       color: '#9eb0c8'
     }).setOrigin(0.5);
 
-    this.makeButton(width / 2, 500, 'Start', () => {
+    this.audioPanel = null;
+    this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+    this.makeButton(width / 2, 440, 'Start', () => {
       this.scene.start('Game');
     });
+    this.makeButton(width / 2, 530, 'Audio Settings', () => {
+      if (!this.audioPanel) this.audioPanel = new AudioSettingsPanel(this, () => { this.audioPanel = null; });
+    });
 
-    this.fullscreenLabel = this.makeButton(width / 2, 600, 'Fullscreen', () => {
+    this.fullscreenLabel = this.makeButton(width / 2, 620, 'Fullscreen', () => {
       if (this.scale.isFullscreen) {
         this.scale.stopFullscreen();
       } else {
@@ -47,6 +53,10 @@ export default class TitleScene extends Phaser.Scene {
       this.scale.off(Phaser.Scale.Events.ENTER_FULLSCREEN, this.refreshFullscreenLabel, this);
       this.scale.off(Phaser.Scale.Events.LEAVE_FULLSCREEN, this.refreshFullscreenLabel, this);
     });
+  }
+
+  update() {
+    if (this.audioPanel && Phaser.Input.Keyboard.JustDown(this.escapeKey)) this.audioPanel.close();
   }
 
   refreshFullscreenLabel() {
