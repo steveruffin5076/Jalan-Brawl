@@ -3,6 +3,7 @@ import { DISPLAY } from '../config.js';
 import SceneAudio from '../systems/SceneAudio.js';
 import { addArcadeButton } from '../ui/ArcadeUI.js';
 import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
+import ControlsGuide, { shouldShowControls, markControlsSeen } from '../ui/ControlsGuide.js';
 
 export default class TitleScene extends Phaser.Scene {
   constructor() {
@@ -31,9 +32,18 @@ export default class TitleScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.audioPanel = null;
+    this.controlsGuide = null;
     this.escapeKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.makeButton(width / 2, 440, 'Start', () => {
-      this.scene.start('Game');
+      if (!shouldShowControls()) {
+        this.scene.start('Game');
+        return;
+      }
+      this.controlsGuide = new ControlsGuide(this, () => {
+        this.controlsGuide = null;
+        markControlsSeen();
+        this.scene.start('Game');
+      });
     });
     this.makeButton(width / 2, 530, 'Audio Settings', () => {
       if (!this.audioPanel) this.audioPanel = new AudioSettingsPanel(this, () => { this.audioPanel = null; });
@@ -56,7 +66,10 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   update() {
-    if (this.audioPanel && Phaser.Input.Keyboard.JustDown(this.escapeKey)) this.audioPanel.close();
+    if (Phaser.Input.Keyboard.JustDown(this.escapeKey)) {
+      if (this.controlsGuide) this.controlsGuide.close();
+      else if (this.audioPanel) this.audioPanel.close();
+    }
   }
 
   refreshFullscreenLabel() {
