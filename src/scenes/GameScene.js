@@ -13,6 +13,7 @@ import InputManager from '../systems/InputManager.js';
 import { depthSort } from '../systems/DepthSort.js';
 import CombatSystem from '../systems/CombatSystem.js';
 import CombatAudio from '../systems/CombatAudio.js';
+import GameplayAudio from '../systems/GameplayAudio.js';
 import SceneAudio from '../systems/SceneAudio.js';
 import AIDirector from '../systems/AIDirector.js';
 import WaveManager from '../systems/WaveManager.js';
@@ -61,6 +62,7 @@ export default class GameScene extends Phaser.Scene {
     this.pickups = [];
     this.director = new AIDirector(combat);
     this.combatAudio = new CombatAudio(this.sound);
+    this.gameplayAudio = new GameplayAudio(this.sound);
     this.combat = new CombatSystem(this, combat);
     this.flow = new WaveManager(stage1, {
       spawn: (spec) => this.spawnFighter(spec),
@@ -139,14 +141,20 @@ export default class GameScene extends Phaser.Scene {
       this.combatAudio.landing(enemy, wasLying);
     }
     const playerWasLying = this.player.lying;
+    const playerBefore = { state: this.player.state, z: this.player.z };
     this.player.update(delta, input);
+    this.gameplayAudio.movement(playerBefore, this.player);
     this.combatAudio.landing(this.player, playerWasLying);
     this.playPlayerSwing();
     if (this.player.leaving) return;
     this.combat.update(delta, this.fighters, this.breakables);
     this.director.reap(this.enemies);
     for (const prop of this.breakables) prop.tick(delta);
-    for (const pickup of this.pickups) pickup.tryCollect(this.player);
+    for (const pickup of this.pickups) {
+      const wasTaken = pickup.taken;
+      pickup.tryCollect(this.player);
+      this.gameplayAudio.pickup(pickup, wasTaken);
+    }
     for (const enemy of this.enemies) this.awardKo(enemy);
 
     this.flow.update(delta, this.player);
