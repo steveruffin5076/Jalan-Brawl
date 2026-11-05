@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { wireMenuSounds } from '../ui/MenuSounds.js';
+import { addArcadeButton, addPanel } from '../ui/ArcadeUI.js';
 import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
 import { DISPLAY, UI } from '../config.js';
 
@@ -12,19 +12,23 @@ export default class PauseScene extends Phaser.Scene {
     const center = DISPLAY.width / 2;
     this.add.rectangle(center, DISPLAY.height / 2, DISPLAY.width, DISPLAY.height, 0x000000, 0.55)
       .setInteractive();
-    this.add.text(center, 180, 'Paused', {
-      fontFamily: 'sans-serif',
-      fontSize: '64px',
-      color: '#f4f1e8'
+    addPanel(this, center, 369, 520, 582);
+    this.add.text(center, 145, 'PAUSED', {
+      fontFamily: 'Arial, sans-serif', fontStyle: 'bold', fontSize: '48px',
+      color: '#f8ead0', stroke: '#14100d', strokeThickness: 4
+    }).setOrigin(0.5);
+    this.add.rectangle(center, 183, 310, 2, 0xb8945e);
+    this.add.text(center, 626, 'JALAN BRAWL  •  PAUSE MENU', {
+      fontFamily: 'Arial, sans-serif', fontSize: '14px', color: '#ba9b71'
     }).setOrigin(0.5);
 
     this.audioPanel = null;
-    this.makeButton(center, 300, 'Resume', () => this.resumeGame());
-    this.makeButton(center, 390, 'Audio Settings', () => {
+    this.makeButton(center, 249, 'Resume', () => this.resumeGame());
+    this.makeButton(center, 340, 'Audio Settings', () => {
       if (!this.audioPanel) this.audioPanel = new AudioSettingsPanel(this, () => { this.audioPanel = null; });
     });
-    this.makeButton(center, 480, 'Restart', () => this.leave('Game'));
-    this.makeButton(center, 570, 'Quit', () => this.leave('Title'));
+    this.makeButton(center, 431, 'Restart', () => this.leave('Game'));
+    this.makeButton(center, 522, 'Quit', () => this.leave('Title'));
 
     this.esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
@@ -59,13 +63,6 @@ export default class PauseScene extends Phaser.Scene {
   }
 
   makeButton(x, y, label, onPress) {
-    const bg = this.add.rectangle(x, y, 320, 72, 0x1e3a5f)
-      .setInteractive({ useHandCursor: true });
-    this.add.text(x, y, label, {
-      fontFamily: 'sans-serif',
-      fontSize: '28px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
-    wireMenuSounds(this, bg, onPress);
+    return addArcadeButton(this, x, y, label, onPress);
   }
 }

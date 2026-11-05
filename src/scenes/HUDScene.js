@@ -6,60 +6,40 @@ export default class HUDScene extends Phaser.Scene {
   }
 
   create() {
-    this.portrait = this.pin(this.add.rectangle(20, 18, 70, 84, 0x3d8bfd).setOrigin(0, 0));
-    this.hpBack = this.pin(this.add.rectangle(104, 36, 260, 20, 0x2a1c18).setOrigin(0, 0.5));
-    this.hpFill = this.pin(this.add.rectangle(104, 36, 260, 20, 0xd64545).setOrigin(0, 0.5));
-    this.hpText = this.pin(this.add.text(374, 36, '', {
-      fontFamily: 'sans-serif',
-      fontSize: '22px',
-      color: '#f4f1e8'
-    })).setOrigin(0, 0.5);
-    this.livesText = this.pin(this.add.text(104, 58, '', {
-      fontFamily: 'sans-serif',
-      fontSize: '22px',
-      color: '#f4f1e8'
+    const label = (x, y, text, size, color = '#f8ead0') => this.pin(this.add.text(x, y, text, {
+      fontFamily: 'Arial, sans-serif', fontStyle: 'bold', fontSize: `${size}px`,
+      color, stroke: '#11100d', strokeThickness: 3
     }));
-    this.scoreText = this.pin(this.add.text(280, 58, '', {
-      fontFamily: 'sans-serif',
-      fontSize: '22px',
-      color: '#f4f1e8'
-    }));
-    this.comboText = this.pin(this.add.text(104, 96, '', {
-      fontFamily: 'sans-serif',
-      fontSize: '28px',
-      color: '#ffd56a'
-    }));
+    // Compact framed HUD leaves the playfield and existing character art untouched.
+    this.pin(this.add.rectangle(20, 15, 346, 92, 0x101c2c, 0.94).setOrigin(0).setStrokeStyle(2, 0xb8945e));
+    label(32, 23, 'HP', 19);
+    this.hpText = label(350, 23, '', 18).setOrigin(1, 0);
+    this.hpBack = this.pin(this.add.rectangle(32, 54, 322, 17, 0x301e1b).setOrigin(0, 0.5).setStrokeStyle(1, 0x9f8054));
+    this.hpFill = this.pin(this.add.rectangle(34, 54, 318, 13, 0xc64b3c).setOrigin(0, 0.5));
+    this.livesText = label(32, 72, '', 18);
+    this.scoreText = label(350, 72, '', 18).setOrigin(1, 0);
+    this.comboText = label(32, 116, '', 25, '#ffcf70');
 
-    this.enemyName = this.pin(this.add.text(104, 140, '', {
-      fontFamily: 'sans-serif',
-      fontSize: '18px',
-      color: '#f4f1e8'
-    }));
-    this.enemyBack = this.pin(this.add.rectangle(104, 166, 180, 10, 0x2a1c18).setOrigin(0, 0.5));
-    this.enemyFill = this.pin(this.add.rectangle(104, 166, 180, 10, 0xe07a3d).setOrigin(0, 0.5));
+    this.enemyName = label(32, 153, '', 18);
+    this.enemyBack = this.pin(this.add.rectangle(32, 184, 180, 10, 0x301e1b).setOrigin(0, 0.5).setStrokeStyle(1, 0x9f8054));
+    this.enemyFill = this.pin(this.add.rectangle(32, 184, 180, 10, 0xe07a3d).setOrigin(0, 0.5));
 
-    this.bossName = this.pin(this.add.text(640, 12, 'TOWKAY', {
-      fontFamily: 'sans-serif',
-      fontSize: '18px',
-      color: '#f4f1e8'
-    })).setOrigin(0.5, 0);
-    this.bossBack = this.pin(this.add.rectangle(640, 42, 420, 16, 0x2a1c18).setOrigin(0.5, 0.5));
-    this.bossFill = this.pin(this.add.rectangle(430, 42, 420, 16, 0xc9a24a).setOrigin(0, 0.5));
+    this.bossFrame = this.pin(this.add.rectangle(720, 57, 530, 84, 0x101c2c, 0.94).setStrokeStyle(2, 0xb8945e));
+    this.bossName = label(720, 26, 'BOSS — TOWKAY', 21).setOrigin(0.5, 0);
+    this.bossBack = this.pin(this.add.rectangle(720, 78, 490, 17, 0x301e1b).setStrokeStyle(1, 0x9f8054));
+    this.bossFill = this.pin(this.add.rectangle(477, 78, 486, 13, 0xc34a3d).setOrigin(0, 0.5));
 
-    const pause = this.pin(this.add.rectangle(1228, 48, 72, 72, 0x1e3a5f).setOrigin(0.5));
+    const pause = this.pin(this.add.rectangle(1228, 48, 72, 72, 0x17283a).setStrokeStyle(3, 0xb8945e));
     pause.setInteractive({ useHandCursor: true });
-    this.pin(this.add.text(1228, 48, 'II', {
-      fontFamily: 'sans-serif',
-      fontSize: '28px',
-      color: '#ffffff'
-    })).setOrigin(0.5);
-    pause.on('pointerover', () => pause.setFillStyle(0x2a5080));
-    pause.on('pointerout', () => pause.setFillStyle(0x1e3a5f));
+    label(1228, 48, 'II', 28).setOrigin(0.5);
+    pause.on('pointerover', () => pause.setFillStyle(0x94632f));
+    pause.on('pointerout', () => pause.setFillStyle(0x17283a));
     pause.on('pointerdown', () => {
       const game = this.scene.get('Game');
       if (game && game.openPause) game.openPause();
     });
 
+    this.bossFrame.setVisible(false);
     this.bossName.setVisible(false);
     this.bossBack.setVisible(false);
     this.bossFill.setVisible(false);
@@ -79,6 +59,7 @@ export default class HUDScene extends Phaser.Scene {
     this.comboText.setText(combo > 0 ? `${combo} HITS!` : '');
 
     const bossOn = !!this.registry.get('bossActive');
+    this.bossFrame.setVisible(bossOn);
     this.bossName.setVisible(bossOn);
     this.bossBack.setVisible(bossOn);
     this.bossFill.setVisible(bossOn);

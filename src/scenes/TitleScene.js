@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { DISPLAY } from '../config.js';
 import SceneAudio from '../systems/SceneAudio.js';
-import { wireMenuSounds } from '../ui/MenuSounds.js';
+import { addArcadeButton } from '../ui/ArcadeUI.js';
 import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
 
 export default class TitleScene extends Phaser.Scene {
@@ -64,16 +64,6 @@ export default class TitleScene extends Phaser.Scene {
   }
 
   makeButton(x, y, label, onPress) {
-    const bg = this.add.rectangle(x, y, 320, 72, 0x1e3a5f)
-      .setInteractive({ useHandCursor: true });
-    const text = this.add.text(x, y, label, {
-      fontFamily: 'sans-serif',
-      fontSize: '28px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
-
-    wireMenuSounds(this, bg, onPress);
-
-    return text;
+    return addArcadeButton(this, x, y, label, onPress);
   }
 }

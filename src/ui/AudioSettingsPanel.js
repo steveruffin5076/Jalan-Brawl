@@ -66,10 +66,10 @@ export default class AudioSettingsPanel {
   }
 
   button(x, y, width, label, action) {
-    const bg = this.add(this.scene.add.rectangle(x, y, width, 62, 0x1e3a5f).setInteractive({ useHandCursor: true }));
+    const bg = this.add(this.scene.add.rectangle(x, y, width, 62, 0x17283a).setStrokeStyle(2, 0xb8945e).setInteractive({ useHandCursor: true }));
     const text = this.text(x, y, label, 24).setOrigin(0.5);
-    bg.on('pointerover', () => bg.setFillStyle(0x2a5080));
-    bg.on('pointerout', () => bg.setFillStyle(0x1e3a5f));
+    bg.on('pointerover', () => bg.setFillStyle(0x94632f));
+    bg.on('pointerout', () => bg.setFillStyle(0x17283a));
     bg.on('pointerdown', action);
     return text;
   }

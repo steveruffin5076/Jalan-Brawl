@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { wireMenuSounds } from '../ui/MenuSounds.js';
+import { addArcadeButton } from '../ui/ArcadeUI.js';
 import { DISPLAY } from '../config.js';
 
 export default class GameOverScene extends Phaser.Scene {
@@ -24,13 +24,6 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   makeButton(x, y, label, onPress) {
-    const bg = this.add.rectangle(x, y, 320, 72, 0x1e3a5f)
-      .setInteractive({ useHandCursor: true });
-    this.add.text(x, y, label, {
-      fontFamily: 'sans-serif',
-      fontSize: '28px',
-      color: '#ffffff'
-    }).setOrigin(0.5);
-    wireMenuSounds(this, bg, onPress);
+    return addArcadeButton(this, x, y, label, onPress);
   }
 }
