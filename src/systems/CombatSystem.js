@@ -5,7 +5,7 @@ export default class CombatSystem {
     this.rules = rules;
     this.sparks = [];
     for (let i = 0; i < 8; i += 1) {
-      const dot = scene.add.circle(0, 0, 8, 0xffe08a, 1).setVisible(false).setDepth(4000);
+      const dot = scene.add.image(0, 0, 'comicImpact').setDisplaySize(64, 64).setVisible(false).setDepth(4000);
       this.sparks.push({ dot, life: 0 });
     }
   }

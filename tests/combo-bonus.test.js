@@ -7,9 +7,9 @@ import AttackBoost from '../src/systems/AttackBoost.js';
 const rules = JSON.parse(readFileSync(new URL('../src/data/combat.json', import.meta.url), 'utf8'));
 function setup() {
   const scores = [], notices = [];
-  const dot = { setVisible() { return this; }, setDepth() { return this; }, setPosition() { return this; } };
+  const dot = { setDisplaySize() { return this; }, setVisible() { return this; }, setDepth() { return this; }, setPosition() { return this; } };
   const scene = {
-    add: { circle: () => dot }, combatAudio: { hit() {} },
+    add: { image: () => dot }, combatAudio: { hit() {} },
     addScore: amount => scores.push(amount),
     registry: { set: (key, value) => { if (key === 'comboBonus') notices.push(value); } }
   };
