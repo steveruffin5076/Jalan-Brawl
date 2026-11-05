@@ -1,5 +1,5 @@
 {
-  "worldWidth": 6580,
+  "worldWidth": 6400,
   "waveGapMs": 700,
   "goBlinkMs": 180,
   "stageClearDelayMs": 900,
@@ -17,7 +17,7 @@
     "farParallax": 0.22,
     "farShiftY": 120,
     "source": [1376, 768],
-    "skyCrop": 0.18,
+    "skyCrop": 0,
     "street": 0.78,
     "streetPad": 16,
     "tileAbove": 1.4,
@@ -29,7 +29,11 @@
       "underpass": "bg_s4",
       "warehouse": "bg_boss"
     },
-    "seam": { "post": 22, "lamp": 14 }
+    "seam": { "post": 22, "lamp": 14, "visible": false }
+  },
+  "enemyDrops": {
+    "chance": 0.2,
+    "weights": { "cash": 6, "tehTarik": 3, "nasiLemak": 1 }
   },
   "pickupTypes": {
     "tehTarik": { "label": "Teh Tarik", "color": "#e07a3d", "heal": 20, "full": false, "score": 0, "image": "tehtarik", "display": 84, "originX": 0.545, "originY": 0.838 },
@@ -44,9 +48,9 @@
     {
       "id": "pasar",
       "name": "Pasar Malam",
-      "triggerX": 900,
+      "triggerX": 640,
       "ground": "#1a3d36",
-      "span": [0, 1750],
+      "span": [0, 1280],
       "waves": [
         [
           { "type": "punk", "side": "right", "y": 618 },
@@ -61,9 +65,9 @@
     {
       "id": "shophouse",
       "name": "Shophouse Row",
-      "triggerX": 2200,
+      "triggerX": 1920,
       "ground": "#2a2148",
-      "span": [1750, 3100],
+      "span": [1280, 2560],
       "waves": [
         [
           { "type": "punk", "side": "left", "y": 618 },
@@ -79,9 +83,9 @@
     {
       "id": "alley",
       "name": "Back Alley",
-      "triggerX": 3600,
+      "triggerX": 3200,
       "ground": "#243040",
-      "span": [3100, 4300],
+      "span": [2560, 3840],
       "waves": [
         [
           { "type": "bruiser", "side": "right", "y": 674 },
@@ -96,9 +100,9 @@
     {
       "id": "underpass",
       "name": "LRT Underpass",
-      "triggerX": 4800,
+      "triggerX": 4480,
       "ground": "#1c3048",
-      "span": [4300, 5300],
+      "span": [3840, 5120],
       "waves": [
         [
           { "type": "rempit", "side": "right", "y": 632 },
@@ -114,9 +118,9 @@
     {
       "id": "warehouse",
       "name": "Warehouse",
-      "triggerX": 5940,
+      "triggerX": 5760,
       "ground": "#3a2820",
-      "span": [5300, 6580],
+      "span": [5120, 6400],
       "skyCrop": 0,
       "boss": "boss1",
       "bossY": 660,
@@ -128,10 +132,10 @@
     }
   ],
   "breakables": [
-    { "type": "crate", "x": 700, "y": 600, "drop": "tehTarik" },
-    { "type": "bin", "x": 1600, "y": 640, "drop": "nasiLemak" },
-    { "type": "crate", "x": 2900, "y": 620, "drop": "cash" },
-    { "type": "bin", "x": 4000, "y": 620, "drop": "tehTarik" },
-    { "type": "crate", "x": 5300, "y": 600, "drop": "nasiLemak" }
+    { "type": "crate", "x": 512, "y": 600, "drop": "tehTarik" },
+    { "type": "bin", "x": 1170, "y": 640, "drop": "nasiLemak" },
+    { "type": "crate", "x": 2370, "y": 620, "drop": "cash" },
+    { "type": "bin", "x": 3520, "y": 620, "drop": "tehTarik" },
+    { "type": "crate", "x": 5120, "y": 600, "drop": "nasiLemak" }
   ]
 }

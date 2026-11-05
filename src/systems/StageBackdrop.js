@@ -2,8 +2,8 @@ import { DISPLAY } from '../config.js';
 
 /**
  * Far skyline scrolls slower than the street. Each section image is scaled
- * so a 768 px source is 720 px tall, then the top sky is left out so the
- * skyline can show above the roofs. The street stays on the bottom.
+ * so a 768 px source is 720 px tall. An optional sky crop reveals the
+ * skyline above the roofs; the street stays on the bottom.
  */
 export function createBackdrop(scene, stage) {
   const spec = stage.backdrop;
@@ -22,7 +22,7 @@ export function createBackdrop(scene, stage) {
     const sectionSpec = section.skyCrop == null ? spec : { ...spec, skyCrop: section.skyCrop };
     seams.push(...layoutSection(scene, key, from, to, stage.worldWidth, sectionSpec, scale));
   }
-  drawSeams(scene, seams, spec);
+  if (spec.seam?.visible !== false) drawSeams(scene, seams, spec);
   return far;
 }
 
