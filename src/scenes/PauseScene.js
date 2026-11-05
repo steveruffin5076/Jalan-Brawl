@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { addArcadeButton, addPanel } from '../ui/ArcadeUI.js';
 import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
 import ControlsGuide from '../ui/ControlsGuide.js';
+import ConfirmLeavePanel from '../ui/ConfirmLeavePanel.js';
 import { DISPLAY, UI } from '../config.js';
 
 export default class PauseScene extends Phaser.Scene {
@@ -25,6 +26,7 @@ export default class PauseScene extends Phaser.Scene {
 
     this.audioPanel = null;
     this.controlsGuide = null;
+    this.confirmPanel = null;
     this.makeButton(center, 230, 'Resume', () => this.resumeGame());
     this.makeButton(center, 310, 'Controls', () => {
       if (!this.controlsGuide) this.controlsGuide = new ControlsGuide(this, () => { this.controlsGuide = null; });
@@ -32,8 +34,8 @@ export default class PauseScene extends Phaser.Scene {
     this.makeButton(center, 390, 'Audio Settings', () => {
       if (!this.audioPanel) this.audioPanel = new AudioSettingsPanel(this, () => { this.audioPanel = null; });
     });
-    this.makeButton(center, 470, 'Restart', () => this.leave('Game'));
-    this.makeButton(center, 550, 'Quit', () => this.leave('Title'));
+    this.makeButton(center, 470, 'Restart', () => this.confirmLeave('restart', 'Game'));
+    this.makeButton(center, 550, 'Quit', () => this.confirmLeave('quit', 'Title'));
 
     this.esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
@@ -47,11 +49,18 @@ export default class PauseScene extends Phaser.Scene {
     }
     const esc = Phaser.Input.Keyboard.JustDown(this.esc);
     const pause = Phaser.Input.Keyboard.JustDown(this.pauseKey);
-    if (this.controlsGuide || this.audioPanel) {
-      if (esc || pause) (this.controlsGuide || this.audioPanel).close();
+    if (this.confirmPanel || this.controlsGuide || this.audioPanel) {
+      if (esc || pause) (this.confirmPanel || this.controlsGuide || this.audioPanel).close();
       return;
     }
     if (esc || pause) this.resumeGame();
+  }
+
+  confirmLeave(action, destination) {
+    if (this.confirmPanel || this.audioPanel || this.controlsGuide) return;
+    this.confirmPanel = new ConfirmLeavePanel(this, action,
+      () => this.leave(destination),
+      () => { this.confirmPanel = null; });
   }
 
   resumeGame() {
