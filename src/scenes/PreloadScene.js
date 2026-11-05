@@ -30,6 +30,7 @@ export default class PreloadScene extends Phaser.Scene {
     }
 
     this.load.image('menuBackground', 'assets/backgrounds/menu-background.png');
+    this.load.image('comicImpact', 'assets/effects/comic-impact.png');
 
     for (const char of atlasIndex) {
       this.load.multiatlas(char, `assets/atlases/${char}.json`, 'assets/atlases');

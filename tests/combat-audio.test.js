@@ -25,8 +25,8 @@ test('impacts follow actual hits, once per swing, and select attack strength', (
 
 test('prop breaks play only after a valid breaking hit', () => {
   const { audio, played } = setup();
-  const dot = { setVisible() { return this; }, setDepth() { return this; }, setPosition() { return this; } };
-  const scene = { combatAudio: audio, add: { circle: () => dot } };
+  const dot = { setDisplaySize() { return this; }, setVisible() { return this; }, setDepth() { return this; }, setPosition() { return this; } };
+  const scene = { combatAudio: audio, add: { image: () => dot } };
   const system = new CombatSystem(scene, { depthLane: 24, propDepthLane: 40, sparkMs: 120 });
   const attacker = { y: 0, z: 0, hitSet: new Set(), attack: { damage: 4 }, isPlayer: false };
   const prop = { y: 0, broken: false, spec: { image: 'crate' }, hp: 8,

@@ -33,8 +33,8 @@ test('boost counts down, refreshes without stacking, expires and clears', () => 
 
 test('boost applies to breakables, but not enemy damage or special health cost', () => {
   const registry = { set() {} };
-  const dot = { setVisible() { return this; }, setDepth() { return this; }, setPosition() { return this; } };
-  const scene = { registry, add: { circle: () => dot }, combatAudio: { hit() {}, breakProp() {} }, addScore() {} };
+  const dot = { setDisplaySize() { return this; }, setVisible() { return this; }, setDepth() { return this; }, setPosition() { return this; } };
+  const scene = { registry, add: { image: () => dot }, combatAudio: { hit() {}, breakProp() {} }, addScore() {} };
   scene.attackBoost = new AttackBoost(rules.attackBoost, registry);
   scene.attackBoost.activate();
   const combat = new CombatSystem(scene, rules);
