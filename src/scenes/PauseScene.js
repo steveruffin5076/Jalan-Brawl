@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { addArcadeButton, addPanel } from '../ui/ArcadeUI.js';
 import AudioSettingsPanel from '../ui/AudioSettingsPanel.js';
+import ControlsGuide from '../ui/ControlsGuide.js';
 import { DISPLAY, UI } from '../config.js';
 
 export default class PauseScene extends Phaser.Scene {
@@ -23,12 +24,16 @@ export default class PauseScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.audioPanel = null;
-    this.makeButton(center, 249, 'Resume', () => this.resumeGame());
-    this.makeButton(center, 340, 'Audio Settings', () => {
+    this.controlsGuide = null;
+    this.makeButton(center, 230, 'Resume', () => this.resumeGame());
+    this.makeButton(center, 310, 'Controls', () => {
+      if (!this.controlsGuide) this.controlsGuide = new ControlsGuide(this, () => { this.controlsGuide = null; });
+    });
+    this.makeButton(center, 390, 'Audio Settings', () => {
       if (!this.audioPanel) this.audioPanel = new AudioSettingsPanel(this, () => { this.audioPanel = null; });
     });
-    this.makeButton(center, 431, 'Restart', () => this.leave('Game'));
-    this.makeButton(center, 522, 'Quit', () => this.leave('Title'));
+    this.makeButton(center, 470, 'Restart', () => this.leave('Game'));
+    this.makeButton(center, 550, 'Quit', () => this.leave('Title'));
 
     this.esc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     this.pauseKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.P);
@@ -42,8 +47,8 @@ export default class PauseScene extends Phaser.Scene {
     }
     const esc = Phaser.Input.Keyboard.JustDown(this.esc);
     const pause = Phaser.Input.Keyboard.JustDown(this.pauseKey);
-    if (this.audioPanel) {
-      if (esc || pause) this.audioPanel.close();
+    if (this.controlsGuide || this.audioPanel) {
+      if (esc || pause) (this.controlsGuide || this.audioPanel).close();
       return;
     }
     if (esc || pause) this.resumeGame();
