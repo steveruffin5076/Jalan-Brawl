@@ -45,7 +45,8 @@ export default class CombatSystem {
     attacker.hitSet.add(target);
     attacker.attackConnected = true;
     this.scene.combatAudio.hit(attacker);
-    target.hp = Math.max(0, target.hp - attacker.attack.damage);
+    const damage = this.scene.attackBoost?.damage(attacker, attacker.attack.damage) ?? attacker.attack.damage;
+    target.hp = Math.max(0, Math.round((target.hp - damage) * 100) / 100);
     target.flashMs = this.rules.flashMs;
     this.paySpecial(attacker);
 
@@ -72,6 +73,14 @@ export default class CombatSystem {
     if (target.isPlayer) this.scene.registry.set('playerHp', target.hp);
     if (attacker.isPlayer) {
       attacker.noteHit();
+      if (attacker.comboCount === this.rules.attackBoost?.triggerHits) {
+        this.scene.attackBoost?.activate();
+      }
+      const bonus = this.rules.comboBonuses?.[attacker.comboCount] || 0;
+      if (bonus) {
+        this.scene.addScore(bonus);
+        this.scene.registry.set('comboBonus', { amount: bonus, hits: attacker.comboCount });
+      }
       this.showEnemyBar(target);
     }
     this.spark(overlapCenter(hitbox, hurt));
@@ -88,7 +97,8 @@ export default class CombatSystem {
     attacker.hitSet.add(prop);
     attacker.attackConnected = true;
     this.paySpecial(attacker);
-    prop.hurt(attacker.attack.damage);
+    const damage = this.scene.attackBoost?.damage(attacker, attacker.attack.damage) ?? attacker.attack.damage;
+    prop.hurt(damage);
     if (prop.broken) this.scene.combatAudio.breakProp(prop);
     this.spark(overlapCenter(hitbox, hurt));
   }
