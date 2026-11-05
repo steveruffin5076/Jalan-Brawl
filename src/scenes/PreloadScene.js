@@ -14,6 +14,10 @@ export default class PreloadScene extends Phaser.Scene {
     for (const name of ['jab', 'hook', 'kick', 'jump-kick', 'special']) {
       this.load.audio(`heroSwing-${name}`, `assets/audio/hero/${name}.mp3`);
     }
+    for (const name of ['hit-light', 'hit-heavy', 'hit-special', 'knockdown',
+      'crate-break', 'bin-break', 'rempit-warning', 'rempit-charge', 'bruiser-slam', 'towkay-lariat']) {
+      this.load.audio(`combat-${name}`, `assets/audio/combat/${name}.mp3`);
+    }
 
     this.load.image('menuBackground', 'assets/backgrounds/menu-background.png');
 
