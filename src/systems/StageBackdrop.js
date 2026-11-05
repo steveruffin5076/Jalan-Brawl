@@ -18,7 +18,9 @@ export function createBackdrop(scene, stage) {
   for (const section of stage.sections) {
     const key = spec.sections[section.id];
     const [from, to] = section.span;
-    seams.push(...layoutSection(scene, key, from, to, stage.worldWidth, spec, scale));
+    // Indoor sections can retain their ceilings instead of exposing the skyline.
+    const sectionSpec = section.skyCrop == null ? spec : { ...spec, skyCrop: section.skyCrop };
+    seams.push(...layoutSection(scene, key, from, to, stage.worldWidth, sectionSpec, scale));
   }
   drawSeams(scene, seams, spec);
   return far;
