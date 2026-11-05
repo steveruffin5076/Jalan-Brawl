@@ -1,3 +1,5 @@
+import { audioSettings } from './AudioSettings.js';
+
 /** Scene-owned background loops: stop on exit and pause with gameplay. */
 export default class SceneAudio {
   constructor(scene) {
@@ -5,6 +7,7 @@ export default class SceneAudio {
     this.music = null;
     this.ambience = null;
     this.musicKey = null;
+    this.unsubscribe = audioSettings.subscribe(() => this.updateVolumes());
     scene.events.on('pause', this.pause, this);
     scene.events.on('resume', this.resume, this);
     scene.events.once('shutdown', () => {
@@ -18,14 +21,19 @@ export default class SceneAudio {
     if (this.musicKey === key) return;
     this.destroySound(this.music);
     this.musicKey = key;
-    this.music = this.sound.add(key, { loop: true, volume: 0.25 });
+    this.music = this.sound.add(key, { loop: true, volume: 0.25 * audioSettings.values.music });
     this.music.play();
   }
 
   startAmbience() {
     if (this.ambience) return;
-    this.ambience = this.sound.add('streetAmbience', { loop: true, volume: 0.65 });
+    this.ambience = this.sound.add('streetAmbience', { loop: true, volume: 0.65 * audioSettings.values.ambience });
     this.ambience.play();
+  }
+
+  updateVolumes() {
+    if (this.music) this.music.volume = 0.25 * audioSettings.values.music;
+    if (this.ambience) this.ambience.volume = 0.65 * audioSettings.values.ambience;
   }
 
   pause() {
@@ -37,6 +45,7 @@ export default class SceneAudio {
   }
 
   dispose() {
+    this.unsubscribe();
     this.destroySound(this.music);
     this.destroySound(this.ambience);
     this.music = null;

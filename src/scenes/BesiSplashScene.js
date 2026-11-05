@@ -1,3 +1,4 @@
+import { audioSettings } from '../systems/AudioSettings.js';
 import Phaser from 'phaser';
 
 const NEXT_SCENE = 'Preload';
@@ -72,7 +73,7 @@ export default class BesiSplashScene extends Phaser.Scene {
     if (this.started) return;
     this.started = true;
     this.sprite.setVisible(true);
-    this.sfx = this.sound.add('besiSplashSfx');
+    this.sfx = this.sound.add('besiSplashSfx', { volume: audioSettings.values.effects });
     this.sfx.play();
     this.sprite.play(this.animKey);
     this.sprite.once('animationcomplete', () => {

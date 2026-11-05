@@ -1,3 +1,4 @@
+import { audioSettings } from '../systems/AudioSettings.js';
 import Phaser from 'phaser';
 import { DISPLAY, FLOOR, HERO_START, INPUT, STAGE } from '../config.js';
 import fighters from '../data/fighters.json';
@@ -171,7 +172,7 @@ export default class GameScene extends Phaser.Scene {
         jumpKick: 'jump-kick', special: 'special'
       };
       const sound = sounds[attack.anim];
-      if (sound) this.sound.play(`heroSwing-${sound}`, { volume: 0.7 });
+      if (sound) this.sound.play(`heroSwing-${sound}`, { volume: 0.7 * audioSettings.values.effects });
     }
     this.lastPlayerSwing = attack;
   }
