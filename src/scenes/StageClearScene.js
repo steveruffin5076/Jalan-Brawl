@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { wireMenuSounds } from '../ui/MenuSounds.js';
 import { DISPLAY } from '../config.js';
 
 export default class StageClearScene extends Phaser.Scene {
@@ -50,9 +51,7 @@ export default class StageClearScene extends Phaser.Scene {
       fontSize: '28px',
       color: '#ffffff'
     }).setOrigin(0.5);
-    bg.on('pointerover', () => bg.setFillStyle(0x2a5080));
-    bg.on('pointerout', () => bg.setFillStyle(0x1e3a5f));
-    bg.on('pointerdown', onPress);
+    wireMenuSounds(this, bg, onPress);
   }
 }
 
