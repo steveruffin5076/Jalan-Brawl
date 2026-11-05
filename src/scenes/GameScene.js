@@ -13,6 +13,7 @@ import InputManager from '../systems/InputManager.js';
 import { depthSort } from '../systems/DepthSort.js';
 import CombatSystem from '../systems/CombatSystem.js';
 import CombatAudio from '../systems/CombatAudio.js';
+import { awardEnemyKO } from '../systems/EnemyDrops.js';
 import GameplayAudio from '../systems/GameplayAudio.js';
 import SceneAudio from '../systems/SceneAudio.js';
 import AIDirector from '../systems/AIDirector.js';
@@ -217,6 +218,11 @@ export default class GameScene extends Phaser.Scene {
     const enemy = spec.type === 'boss1'
       ? new Boss(this, x, y, stats, this.rules, spec.side || 'right')
       : new Enemy(this, x, y, stats, this.rules, spec.side || 'right');
+    // Keep the enemy's name for the HUD, but remove the floating world label.
+    if (enemy.label) {
+      enemy.label.destroy();
+      enemy.label = null;
+    }
     this.enemies.push(enemy);
     this.fighters.push(enemy);
   }
@@ -238,8 +244,14 @@ export default class GameScene extends Phaser.Scene {
 
   awardKo(enemy) {
     if (enemy.scored || enemy.state !== 'dead') return;
-    enemy.scored = true;
-    this.addScore(this.stage.koScore[enemy.kind] || 0);
+    awardEnemyKO(enemy, this.stage, {
+      score: amount => this.addScore(amount),
+      drop: (fighter, item) => {
+        const x = Phaser.Math.Clamp(fighter.x, this.playfield.left, this.playfield.right);
+        const y = Phaser.Math.Clamp(fighter.y, FLOOR.top, FLOOR.bottom);
+        this.dropPickup(x, y, item);
+      }
+    });
   }
 
   addScore(amount) {

@@ -1,5 +1,4 @@
-import Phaser from 'phaser';
-import { DISPLAY } from '../config.js';
+import { fightScrollForSection } from './StageLayout.js';
 
 /**
  * Walks the stage left to right. Crossing a trigger freezes the camera,
@@ -57,8 +56,7 @@ export default class WaveManager {
   }
 
   lock(section, player) {
-    const maxScroll = Math.max(0, this.stage.worldWidth - DISPLAY.width);
-    this.lockScroll = Phaser.Math.Clamp(player.x - DISPLAY.width / 2, 0, maxScroll);
+    this.lockScroll = fightScrollForSection(this.stage, section);
     this.locked = true;
     this.waveIndex = 0;
     this.showGo = false;
