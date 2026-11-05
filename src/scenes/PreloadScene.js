@@ -11,6 +11,9 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    for (const name of ['pickup-cash', 'pickup-food', 'jump', 'landing', 'game-over', 'stage-clear']) {
+      this.load.audio(`gameplay-${name}`, `assets/audio/gameplay/${name}.mp3`);
+    }
     this.load.audio('menuMusic', 'assets/audio/music/menu.mp3');
     this.load.audio('stageMusic', 'assets/audio/music/stage.mp3');
     this.load.audio('bossMusic', 'assets/audio/music/boss.mp3');

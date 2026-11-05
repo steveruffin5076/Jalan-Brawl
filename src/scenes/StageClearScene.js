@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { addArcadeButton } from '../ui/ArcadeUI.js';
 import { DISPLAY } from '../config.js';
+import { playResultCue } from '../systems/GameplayAudio.js';
 
 export default class StageClearScene extends Phaser.Scene {
   constructor() {
@@ -8,6 +9,7 @@ export default class StageClearScene extends Phaser.Scene {
   }
 
   create() {
+    playResultCue(this, 'stage-clear');
     const center = DISPLAY.width / 2;
     const score = this.registry.get('score') || 0;
     const timeMs = this.registry.get('timeMs') || 0;

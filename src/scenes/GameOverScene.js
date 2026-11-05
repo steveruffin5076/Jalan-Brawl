@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { addArcadeButton } from '../ui/ArcadeUI.js';
 import { DISPLAY } from '../config.js';
+import { playResultCue } from '../systems/GameplayAudio.js';
 
 export default class GameOverScene extends Phaser.Scene {
   constructor() {
@@ -8,6 +9,7 @@ export default class GameOverScene extends Phaser.Scene {
   }
 
   create() {
+    playResultCue(this, 'game-over');
     const center = DISPLAY.width / 2;
     this.add.text(center, 250, 'Game Over', {
       fontFamily: 'sans-serif',
