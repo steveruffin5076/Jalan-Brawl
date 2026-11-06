@@ -161,9 +161,12 @@ export default class GameScene extends Phaser.Scene {
     if (!this.mapTransition.isTransitioning && this.stage.sections) {
       const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections, this.currentAreaIndex);
       if (nextSection) {
+        console.log(`[TRANSITION] Detected area change: ${this.stage.sections[this.currentAreaIndex].id} -> ${nextSection.id}`);
         this.mapTransition.transitionToArea(nextSection.id, (nextAreaId) => {
+          console.log(`[TRANSITION] Fading to black for area: ${nextAreaId}`);
           this.unloadArea();
           this.loadArea(nextAreaId);
+          console.log(`[TRANSITION] Area loaded: ${nextAreaId}, new currentAreaIndex: ${this.currentAreaIndex}`);
         });
         return;
       }

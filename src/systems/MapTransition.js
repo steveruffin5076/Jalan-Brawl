@@ -10,6 +10,7 @@ export default class MapTransition {
     this.scene = scene;
     this.isTransitioning = false;
     this.fadeOverlay = null;
+    this.lastPlayerSection = 0;
   }
 
   /**
