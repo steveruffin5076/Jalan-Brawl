@@ -89,8 +89,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Initialize map transition system
     // TEMPORARILY DISABLED FOR TESTING
-    // this.mapTransition = new MapTransition(this);
-    this.mapTransition = { isTransitioning: false, update: () => {} }; // Stub
+    this.mapTransition = new MapTransition(this);
     this.currentAreaIndex = 0;
 
     this.goText = this.add.text(1040, 360, 'GO →', {
@@ -162,9 +161,7 @@ export default class GameScene extends Phaser.Scene {
     this.playPlayerSwing();
     if (this.player.leaving) return;
 
-    // Check for map area transition
-    // TEMPORARILY DISABLED TO TEST IF THIS IS THE FREEZE CAUSE
-    if (false && !this.mapTransition.isTransitioning && this.stage.sections) {
+    if (!this.mapTransition.isTransitioning && this.stage.sections) {
       if (this.timeMs % 2000 < 16) {
         console.log(`[TRANSITION-CHECK] Player X: ${this.player.x}, currentAreaIndex: ${this.currentAreaIndex}, hasStage: ${!!this.stage}, sectionsCount: ${this.stage.sections.length}`);
       }
@@ -357,7 +354,7 @@ export default class GameScene extends Phaser.Scene {
     try {
       console.log('[TRANSITION-UNLOAD] Starting unloadArea...');
       
-      // Pause enemies and halt wave manager
+      // Pause enemies and halt wave manager - CLEAR IN PLACE, don't reassign
       console.log(`[TRANSITION-UNLOAD] Dismissing ${this.enemies.length} enemies`);
       for (const enemy of this.enemies) {
         if (!enemy.removed) {
@@ -368,33 +365,36 @@ export default class GameScene extends Phaser.Scene {
           }
         }
       }
-      this.enemies = [];
+      this.enemies.length = 0; // Clear in place instead of reassignment
       console.log('[TRANSITION-UNLOAD] Enemies cleared');
       
-      this.fighters = [this.player];
+      // Keep player in fighters array
+      while (this.fighters.length > 1) {
+        this.fighters.pop();
+      }
       console.log('[TRANSITION-UNLOAD] Fighters reset to player only');
 
-      // Clear breakables and pickups
+      // Clear breakables and pickups in place
       console.log(`[TRANSITION-UNLOAD] Destroying ${this.breakables.length} breakables`);
-      for (const breakable of this.breakables) {
+      while (this.breakables.length > 0) {
+        const breakable = this.breakables.pop();
         try {
           breakable.destroy();
         } catch (e) {
           console.error(`[TRANSITION-UNLOAD] Error destroying breakable:`, e.message);
         }
       }
-      this.breakables = [];
       console.log('[TRANSITION-UNLOAD] Breakables cleared');
 
       console.log(`[TRANSITION-UNLOAD] Destroying ${this.pickups.length} pickups`);
-      for (const pickup of this.pickups) {
+      while (this.pickups.length > 0) {
+        const pickup = this.pickups.pop();
         try {
           pickup.destroy();
         } catch (e) {
           console.error(`[TRANSITION-UNLOAD] Error destroying pickup:`, e.message);
         }
       }
-      this.pickups = [];
       console.log('[TRANSITION-UNLOAD] Pickups cleared');
 
       // Reset director
