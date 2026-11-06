@@ -71,9 +71,13 @@ export default class MapTransition {
       const currentSection = sections[i];
       const nextSection = sections[i + 1];
 
-      // Check if player has crossed into the next section
-      if (playerX >= nextSection.start && playerX < nextSection.end) {
-        // Only trigger if moving from current section to next
+      // Get boundaries from span array [start, end]
+      const currentEnd = currentSection.span[1];
+      const nextStart = nextSection.span[0];
+
+      // Check if player has crossed from current section into next section
+      if (playerX >= nextStart && playerX < nextSection.span[1]) {
+        // Only trigger once per section transition
         if (this.lastPlayerSection !== i + 1) {
           this.lastPlayerSection = i + 1;
           return nextSection;

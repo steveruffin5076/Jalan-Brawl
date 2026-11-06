@@ -380,9 +380,10 @@ export default class GameScene extends Phaser.Scene {
     // Reset wave manager to this section
     this.flow.reset(sectionIndex);
 
-    // Optionally update the camera to focus on the new area
-    if (section.start !== undefined) {
-      this.player.x = Math.max(section.start + 100, this.player.x);
+    // Position player at the start of the new area
+    if (section.span && section.span.length === 2) {
+      const areaStart = section.span[0];
+      this.player.x = Math.max(areaStart + 100, this.player.x);
     }
 
     // Update area banner
