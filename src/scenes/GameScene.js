@@ -128,6 +128,9 @@ export default class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.f1)) this.debugOn = !this.debugOn;
     if (this.touchControls) this.touchControls.pin();
 
+    // Update map transition state each frame
+    this.mapTransition.update(delta);
+
     const input = this.inputManager.poll();
     if (input.pausePressed) {
       this.openPause();

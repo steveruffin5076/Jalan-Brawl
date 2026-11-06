@@ -11,17 +11,60 @@ export default class MapTransition {
     this.isTransitioning = false;
     this.fadeOverlay = null;
     this.lastPlayerSection = 0;
+    this.transitionState = null; // 'fading-out', 'loading', 'fading-in'
+    this.fadeElapsed = 0;
+    this.fadeDuration = 300;
+  }
+
+  /**
+   * Update transition state each frame
+   */
+  update(delta) {
+    if (!this.isTransitioning || !this.transitionState) return;
+
+    this.fadeElapsed += delta;
+
+    if (this.transitionState === 'fading-out') {
+      // Fade to black
+      const progress = Math.min(this.fadeElapsed / this.fadeDuration, 1);
+      this.fadeOverlay.setAlpha(progress);
+
+      if (progress >= 1) {
+        // Transition complete, call the callback and move to loading state
+        if (this.transitionCallback) {
+          this.transitionCallback(this.transitionAreaId);
+          this.transitionCallback = null;
+        }
+        this.transitionState = 'fading-in';
+        this.fadeElapsed = 0;
+      }
+    } else if (this.transitionState === 'fading-in') {
+      // Fade from black
+      const progress = Math.min(this.fadeElapsed / this.fadeDuration, 1);
+      this.fadeOverlay.setAlpha(1 - progress);
+
+      if (progress >= 1) {
+        // Transition complete
+        this.isTransitioning = false;
+        this.transitionState = null;
+        this.fadeOverlay.setAlpha(0);
+      }
+    }
   }
 
   /**
    * Trigger a transition to a new map area
    * @param {string} nextAreaId - The ID of the next area (e.g., 'pasar', 'shophouse')
-   * @param {Function} onTransitionComplete - Callback when transition finishes
+   * @param {Function} onTransitionComplete - Callback when transition should happen
    */
   transitionToArea(nextAreaId, onTransitionComplete) {
     if (this.isTransitioning) return;
-    
+
     this.isTransitioning = true;
+    this.transitionState = 'fading-out';
+    this.fadeElapsed = 0;
+    this.transitionAreaId = nextAreaId;
+    this.transitionCallback = onTransitionComplete;
 
     // Create black fade overlay if it doesn't exist
     if (!this.fadeOverlay) {
@@ -35,28 +78,7 @@ export default class MapTransition {
       ).setScrollFactor(0).setDepth(1000);
     }
 
-    // Fade to black
-    this.scene.tweens.add({
-      targets: this.fadeOverlay,
-      alpha: 1,
-      duration: 300,
-      onComplete: () => {
-        // Call the cleanup and reload callback
-        if (onTransitionComplete) {
-          onTransitionComplete(nextAreaId);
-        }
-
-        // Fade back in
-        this.scene.tweens.add({
-          targets: this.fadeOverlay,
-          alpha: 0,
-          duration: 300,
-          onComplete: () => {
-            this.isTransitioning = false;
-          }
-        });
-      }
-    });
+    this.fadeOverlay.setAlpha(0);
   }
 
   /**
@@ -81,6 +103,7 @@ export default class MapTransition {
       // Only trigger once per section transition
       if (this.lastPlayerSection !== currentSectionIndex + 1) {
         this.lastPlayerSection = currentSectionIndex + 1;
+        console.log(`[TRANSITION] Boundary detected at x=${playerX}, transition x=${transitionX}`);
         return nextSection;
       }
     }
@@ -94,9 +117,12 @@ export default class MapTransition {
   reset() {
     this.isTransitioning = false;
     this.lastPlayerSection = 0;
+    this.transitionState = null;
+    this.fadeElapsed = 0;
     if (this.fadeOverlay) {
       this.fadeOverlay.destroy();
       this.fadeOverlay = null;
     }
   }
 }
+
