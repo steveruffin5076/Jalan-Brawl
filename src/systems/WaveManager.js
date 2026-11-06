@@ -93,4 +93,22 @@ export default class WaveManager {
     this.waveIndex = 0;
     this.showGo = true;
   }
+
+  /**
+   * Reset the wave manager to a specific section
+   * @param {number} sectionIndex - The section index to reset to
+   */
+  reset(sectionIndex) {
+    this.sectionIndex = sectionIndex;
+    this.waveIndex = 0;
+    this.locked = false;
+    this.lockScroll = 0;
+    this.waveLive = false;
+    this.waiting = false;
+    this.waitMs = 0;
+    this.showGo = false;
+    this.pendingClear = false;
+    this.clearMs = 0;
+    this.clearFired = false;
+  }
 }
