@@ -159,7 +159,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Check for map area transition
     if (!this.mapTransition.isTransitioning && this.stage.sections) {
-      const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections);
+      const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections, this.currentAreaIndex);
       if (nextSection) {
         this.mapTransition.transitionToArea(nextSection.id, (nextAreaId) => {
           this.unloadArea();
@@ -377,14 +377,8 @@ export default class GameScene extends Phaser.Scene {
     this.currentAreaIndex = sectionIndex;
     const section = this.stage.sections[sectionIndex];
 
-    // Reset wave manager to this section
+    // Reset wave manager to this section for fresh wave spawning
     this.flow.reset(sectionIndex);
-
-    // Position player at the start of the new area
-    if (section.span && section.span.length === 2) {
-      const areaStart = section.span[0];
-      this.player.x = Math.max(areaStart + 100, this.player.x);
-    }
 
     // Update area banner
     this.areaBanner.update(0, this.player.x);

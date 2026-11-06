@@ -62,26 +62,25 @@ export default class MapTransition {
    * Check if player has reached a transition boundary
    * @param {number} playerX - Player's X position
    * @param {Array} sections - Array of section data with boundaries
+   * @param {number} currentSectionIndex - Current section index
    * @returns {Object|null} - Next section or null if no transition
    */
-  checkAreaTransition(playerX, sections) {
+  checkAreaTransition(playerX, sections, currentSectionIndex) {
     if (!sections || sections.length === 0) return null;
+    if (currentSectionIndex >= sections.length - 1) return null;
 
-    for (let i = 0; i < sections.length - 1; i++) {
-      const currentSection = sections[i];
-      const nextSection = sections[i + 1];
+    const currentSection = sections[currentSectionIndex];
+    const nextSection = sections[currentSectionIndex + 1];
 
-      // Get boundaries from span array [start, end]
-      const currentEnd = currentSection.span[1];
-      const nextStart = nextSection.span[0];
+    // Get boundaries from span array [start, end]
+    const transitionX = nextSection.span[0];
 
-      // Check if player has crossed from current section into next section
-      if (playerX >= nextStart && playerX < nextSection.span[1]) {
-        // Only trigger once per section transition
-        if (this.lastPlayerSection !== i + 1) {
-          this.lastPlayerSection = i + 1;
-          return nextSection;
-        }
+    // Check if player has crossed into the next section
+    if (playerX >= transitionX) {
+      // Only trigger once per section transition
+      if (this.lastPlayerSection !== currentSectionIndex + 1) {
+        this.lastPlayerSection = currentSectionIndex + 1;
+        return nextSection;
       }
     }
 
