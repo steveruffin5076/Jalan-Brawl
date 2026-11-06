@@ -30,11 +30,17 @@ export default class MapTransition {
       this.fadeOverlay.setAlpha(progress);
 
       if (progress >= 1) {
-        console.log(`[TRANSITION] Fade complete at ${this.fadeElapsed}ms, executing callback for ${this.transitionAreaId}`);
+        console.log(`[TRANSITION-FADE] Fade complete, executing callback`);
         // Transition complete, call the callback and move to loading state
         if (this.transitionCallback) {
-          this.transitionCallback(this.transitionAreaId);
-          this.transitionCallback = null;
+          try {
+            console.log(`[TRANSITION-FADE] Calling callback for area: ${this.transitionAreaId}`);
+            this.transitionCallback(this.transitionAreaId);
+            this.transitionCallback = null;
+            console.log(`[TRANSITION-FADE] Callback completed successfully`);
+          } catch (error) {
+            console.error('[TRANSITION-FADE] ERROR in callback:', error.message, error.stack);
+          }
         }
         this.transitionState = 'fading-in';
         this.fadeElapsed = 0;
@@ -46,7 +52,7 @@ export default class MapTransition {
 
       if (progress >= 1) {
         // Transition complete
-        console.log(`[TRANSITION] Fade-in complete, transition finished`);
+        console.log(`[TRANSITION-FADE] Fade-in complete, transition finished`);
         this.isTransitioning = false;
         this.transitionState = null;
         this.fadeOverlay.setAlpha(0);
