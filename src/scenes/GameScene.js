@@ -88,6 +88,7 @@ export default class GameScene extends Phaser.Scene {
     };
 
     // Initialize map transition system
+    // TEMPORARILY DISABLED FOR TESTING
     this.mapTransition = new MapTransition(this);
     this.currentAreaIndex = 0;
 
@@ -128,6 +129,9 @@ export default class GameScene extends Phaser.Scene {
     if (Phaser.Input.Keyboard.JustDown(this.f1)) this.debugOn = !this.debugOn;
     if (this.touchControls) this.touchControls.pin();
 
+    // Update map transition state each frame
+    this.mapTransition.update(delta);
+
     const input = this.inputManager.poll();
     if (input.pausePressed) {
       this.openPause();
@@ -157,15 +161,21 @@ export default class GameScene extends Phaser.Scene {
     this.playPlayerSwing();
     if (this.player.leaving) return;
 
-    // Check for map area transition
     if (!this.mapTransition.isTransitioning && this.stage.sections) {
-      const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections);
+      if (this.timeMs % 2000 < 16) {
+        console.log(`[TRANSITION-CHECK] Player X: ${this.player.x}, currentAreaIndex: ${this.currentAreaIndex}, hasStage: ${!!this.stage}, sectionsCount: ${this.stage.sections.length}`);
+      }
+      
+      const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections, this.currentAreaIndex);
       if (nextSection) {
+        console.log(`[TRANSITION] ⚠️ TRANSITION TRIGGERED at playerX=${this.player.x}`);
+        console.log(`[TRANSITION] From: ${this.stage.sections[this.currentAreaIndex].id} → To: ${nextSection.id}`);
         this.mapTransition.transitionToArea(nextSection.id, (nextAreaId) => {
+          console.log(`[TRANSITION] CALLBACK STARTED for ${nextAreaId}`);
           this.unloadArea();
           this.loadArea(nextAreaId);
+          console.log(`[TRANSITION] ✓ CALLBACK COMPLETE: now in ${nextAreaId}`);
         });
-        return;
       }
     }
 
@@ -341,26 +351,59 @@ export default class GameScene extends Phaser.Scene {
    * Unload current map area - clear enemies, breakables, and pickups
    */
   unloadArea() {
-    // Pause enemies and halt wave manager
-    for (const enemy of this.enemies) {
-      if (!enemy.removed) enemy.dismiss();
-    }
-    this.enemies = [];
-    this.fighters = [this.player];
+    try {
+      console.log('[TRANSITION-UNLOAD] Starting unloadArea...');
+      
+      // Pause enemies and halt wave manager - CLEAR IN PLACE, don't reassign
+      console.log(`[TRANSITION-UNLOAD] Dismissing ${this.enemies.length} enemies`);
+      for (const enemy of this.enemies) {
+        if (!enemy.removed) {
+          try {
+            enemy.dismiss();
+          } catch (e) {
+            console.error(`[TRANSITION-UNLOAD] Error dismissing enemy:`, e.message);
+          }
+        }
+      }
+      this.enemies.length = 0; // Clear in place instead of reassignment
+      console.log('[TRANSITION-UNLOAD] Enemies cleared');
+      
+      // Keep player in fighters array
+      while (this.fighters.length > 1) {
+        this.fighters.pop();
+      }
+      console.log('[TRANSITION-UNLOAD] Fighters reset to player only');
 
-    // Clear breakables and pickups
-    for (const breakable of this.breakables) {
-      breakable.destroy();
-    }
-    this.breakables = [];
+      // Clear breakables and pickups in place
+      console.log(`[TRANSITION-UNLOAD] Destroying ${this.breakables.length} breakables`);
+      while (this.breakables.length > 0) {
+        const breakable = this.breakables.pop();
+        try {
+          breakable.destroy();
+        } catch (e) {
+          console.error(`[TRANSITION-UNLOAD] Error destroying breakable:`, e.message);
+        }
+      }
+      console.log('[TRANSITION-UNLOAD] Breakables cleared');
 
-    for (const pickup of this.pickups) {
-      pickup.destroy();
-    }
-    this.pickups = [];
+      console.log(`[TRANSITION-UNLOAD] Destroying ${this.pickups.length} pickups`);
+      while (this.pickups.length > 0) {
+        const pickup = this.pickups.pop();
+        try {
+          pickup.destroy();
+        } catch (e) {
+          console.error(`[TRANSITION-UNLOAD] Error destroying pickup:`, e.message);
+        }
+      }
+      console.log('[TRANSITION-UNLOAD] Pickups cleared');
 
-    // Reset director
-    this.director.reset();
+      // Reset director
+      console.log('[TRANSITION-UNLOAD] Resetting director');
+      this.director.reset();
+      console.log('[TRANSITION-UNLOAD] COMPLETE');
+    } catch (error) {
+      console.error('[TRANSITION-UNLOAD] CRITICAL ERROR:', error.message, error.stack);
+    }
   }
 
   /**
@@ -368,24 +411,31 @@ export default class GameScene extends Phaser.Scene {
    * @param {string} areaId - The area ID to load (e.g., 'pasar', 'shophouse')
    */
   loadArea(areaId) {
-    const sectionIndex = this.stage.sections.findIndex((s) => s.id === areaId);
-    if (sectionIndex === -1) {
-      console.warn(`Area not found: ${areaId}`);
-      return;
+    try {
+      console.log(`[TRANSITION-LOAD] Starting loadArea for: ${areaId}`);
+      
+      const sectionIndex = this.stage.sections.findIndex((s) => s.id === areaId);
+      if (sectionIndex === -1) {
+        console.error(`[TRANSITION-LOAD] Area not found: ${areaId}`);
+        return;
+      }
+      console.log(`[TRANSITION-LOAD] Found section at index ${sectionIndex}`);
+
+      this.currentAreaIndex = sectionIndex;
+      const section = this.stage.sections[sectionIndex];
+      console.log(`[TRANSITION-LOAD] Set currentAreaIndex to ${sectionIndex}`);
+
+      // Reset wave manager to this section for fresh wave spawning
+      console.log(`[TRANSITION-LOAD] Calling flow.reset(${sectionIndex})`);
+      this.flow.reset(sectionIndex);
+      console.log('[TRANSITION-LOAD] Wave manager reset complete');
+
+      // Update area banner
+      console.log('[TRANSITION-LOAD] Updating area banner');
+      this.areaBanner.update(0, this.player.x);
+      console.log('[TRANSITION-LOAD] COMPLETE');
+    } catch (error) {
+      console.error('[TRANSITION-LOAD] CRITICAL ERROR:', error.message, error.stack);
     }
-
-    this.currentAreaIndex = sectionIndex;
-    const section = this.stage.sections[sectionIndex];
-
-    // Reset wave manager to this section
-    this.flow.reset(sectionIndex);
-
-    // Optionally update the camera to focus on the new area
-    if (section.start !== undefined) {
-      this.player.x = Math.max(section.start + 100, this.player.x);
-    }
-
-    // Update area banner
-    this.areaBanner.update(0, this.player.x);
   }
 }
