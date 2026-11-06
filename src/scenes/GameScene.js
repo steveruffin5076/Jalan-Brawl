@@ -88,7 +88,9 @@ export default class GameScene extends Phaser.Scene {
     };
 
     // Initialize map transition system
-    this.mapTransition = new MapTransition(this);
+    // TEMPORARILY DISABLED FOR TESTING
+    // this.mapTransition = new MapTransition(this);
+    this.mapTransition = { isTransitioning: false, update: () => {} }; // Stub
     this.currentAreaIndex = 0;
 
     this.goText = this.add.text(1040, 360, 'GO →', {
@@ -161,14 +163,21 @@ export default class GameScene extends Phaser.Scene {
     if (this.player.leaving) return;
 
     // Check for map area transition
-    if (!this.mapTransition.isTransitioning && this.stage.sections) {
+    // TEMPORARILY DISABLED TO TEST IF THIS IS THE FREEZE CAUSE
+    if (false && !this.mapTransition.isTransitioning && this.stage.sections) {
+      if (this.timeMs % 2000 < 16) {
+        console.log(`[TRANSITION-CHECK] Player X: ${this.player.x}, currentAreaIndex: ${this.currentAreaIndex}, hasStage: ${!!this.stage}, sectionsCount: ${this.stage.sections.length}`);
+      }
+      
       const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections, this.currentAreaIndex);
       if (nextSection) {
-        console.log(`[TRANSITION] Triggered transition from ${this.stage.sections[this.currentAreaIndex].id} to ${nextSection.id} at playerX=${this.player.x}`);
+        console.log(`[TRANSITION] ⚠️ TRANSITION TRIGGERED at playerX=${this.player.x}`);
+        console.log(`[TRANSITION] From: ${this.stage.sections[this.currentAreaIndex].id} → To: ${nextSection.id}`);
         this.mapTransition.transitionToArea(nextSection.id, (nextAreaId) => {
+          console.log(`[TRANSITION] CALLBACK STARTED for ${nextAreaId}`);
           this.unloadArea();
           this.loadArea(nextAreaId);
-          console.log(`[TRANSITION] Area transition complete: now in ${nextAreaId}`);
+          console.log(`[TRANSITION] ✓ CALLBACK COMPLETE: now in ${nextAreaId}`);
         });
       }
     }
