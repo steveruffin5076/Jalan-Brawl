@@ -22,6 +22,7 @@ import SceneAudio from '../systems/SceneAudio.js';
 import AIDirector from '../systems/AIDirector.js';
 import WaveManager from '../systems/WaveManager.js';
 import { drawDebug } from '../systems/DebugDraw.js';
+import { MAP_FADE_MS, entryPoint, exitReady, mapView } from '../systems/MapTransition.js';
 import { createBackdrop, scrollBackdrop, streetLine } from '../systems/StageBackdrop.js';
 import TouchControls from '../ui/TouchControls.js';
 import AreaBanner from '../ui/AreaBanner.js';
@@ -39,6 +40,8 @@ export default class GameScene extends Phaser.Scene {
     this.enemyFocusMs = 0;
     this.pausedForMenu = false;
     this.clearStarted = false;
+    this.mapIndex = 0;
+    this.mapFading = false;
     this.goBlink = 0;
     this.goOn = true;
     this.backgroundAudio = new SceneAudio(this);
@@ -81,10 +84,8 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.cameras.main.setBounds(0, 0, stage1.worldWidth, DISPLAY.height);
-    this.playfield = {
-      left: STAGE.left,
-      right: stage1.worldWidth - (DISPLAY.width - STAGE.right)
-    };
+    const firstMap = mapView(stage1, 0);
+    this.playfield = { left: firstMap.left, right: firstMap.right };
 
     this.goText = this.add.text(1040, 360, 'GO →', {
       fontFamily: 'sans-serif',
@@ -124,6 +125,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.touchControls) this.touchControls.pin();
 
     const input = this.inputManager.poll();
+    // The world stays frozen while the screen is black between maps.
+    if (this.mapFading) return;
     if (input.pausePressed) {
       this.openPause();
       return;
@@ -164,6 +167,10 @@ export default class GameScene extends Phaser.Scene {
 
     this.flow.update(delta, this.player);
     if (this.clearStarted) return;
+    if (exitReady(this.flow, this.mapIndex, this.player, this.playfield)) {
+      this.beginMapTransition();
+      return;
+    }
     this.applyCamera();
 
     for (const fighter of this.fighters) {
@@ -190,25 +197,47 @@ export default class GameScene extends Phaser.Scene {
     this.lastPlayerSwing = attack;
   }
 
+  /** The camera shows one map at a time. The next map appears only after the black fade. */
   applyCamera() {
     const camera = this.cameras.main;
-    const maxScroll = Math.max(0, this.stage.worldWidth - DISPLAY.width);
-    if (this.flow.locked) {
-      camera.scrollX = this.flow.lockScroll;
-    } else {
-      camera.scrollX = Phaser.Math.Clamp(this.player.x - DISPLAY.width / 2, 0, maxScroll);
-    }
-    const scroll = camera.scrollX;
-    if (this.farLayer) scrollBackdrop(this.farLayer, scroll, this.stage.backdrop);
-    if (this.flow.locked) {
-      this.playfield = { left: scroll + STAGE.left, right: scroll + STAGE.right };
-    } else {
-      this.playfield = {
-        left: STAGE.left,
-        right: this.stage.worldWidth - (DISPLAY.width - STAGE.right)
-      };
-    }
+    const view = mapView(this.stage, this.mapIndex);
+    camera.scrollX = view.scroll;
+    if (this.farLayer) scrollBackdrop(this.farLayer, view.scroll, this.stage.backdrop);
+    this.playfield = { left: view.left, right: view.right };
     this.director.setBounds(this.playfield.left, this.playfield.right);
+  }
+
+  beginMapTransition() {
+    if (this.mapFading) return;
+    this.mapFading = true;
+    this.goText.setVisible(false);
+    const camera = this.cameras.main;
+    const events = Phaser.Cameras.Scene2D.Events;
+    camera.once(events.FADE_OUT_COMPLETE, () => {
+      this.mapIndex = this.flow.sectionIndex;
+      this.placePlayerOnMap();
+      this.applyCamera();
+      depthSort(this.fighters);
+      camera.once(events.FADE_IN_COMPLETE, () => {
+        this.mapFading = false;
+      });
+      camera.fadeIn(MAP_FADE_MS, 0, 0, 0);
+    });
+    camera.fadeOut(MAP_FADE_MS, 0, 0, 0);
+  }
+
+  placePlayerOnMap() {
+    const spot = entryPoint(this.stage, this.mapIndex);
+    const player = this.player;
+    player.clearSwing();
+    player.x = spot.x;
+    player.y = spot.y;
+    player.z = 0;
+    player.vx = 0;
+    player.vz = 0;
+    player.facing = 1;
+    player.comboStep = 0;
+    player.state = 'idle';
   }
 
   spawnFighter(spec) {

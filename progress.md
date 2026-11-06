@@ -29,6 +29,7 @@ Stage 1, its combat systems, menus, audio and recent gameplay enhancements are i
 - Increased player and enemy movement/dash speed by 15% and shortened hitstop, without changing attack animation playback. Set `PACE_MULTIPLIER` to `1` in `src/systems/GameplayPace.js` to restore the previous movement and hitstop (PR #13).
 - Replaced the yellow hit marker with a comic-style impact sprite (PR #14).
 - Added a forward burst to the existing airborne jump kick, preserving its input, damage and animation. Set the speed in `src/systems/FlyingKick.js` to `0` to restore the original movement behavior (PR #15).
+- Each area is now its own map. The camera stays on one area; after GO, walking into the right edge fades to black (350 ms out, 350 ms in) and the hero starts the next area at its left side. Logic is in `src/systems/MapTransition.js`; set `MAP_FADE_MS` there to change the fade length.
 
 ## Remaining work and checks
 
