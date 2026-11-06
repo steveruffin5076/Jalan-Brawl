@@ -162,21 +162,14 @@ export default class GameScene extends Phaser.Scene {
 
     // Check for map area transition
     if (!this.mapTransition.isTransitioning && this.stage.sections) {
-      // Log player position every 30 frames for debugging
-      if (this.timeMs % 500 < 16) {
-        console.log(`[DEBUG] Player X: ${this.player.x}, Current area: ${this.currentAreaIndex}`);
-      }
-      
       const nextSection = this.mapTransition.checkAreaTransition(this.player.x, this.stage.sections, this.currentAreaIndex);
       if (nextSection) {
-        console.log(`[TRANSITION] Detected area change at playerX=${this.player.x}: ${this.stage.sections[this.currentAreaIndex].id} -> ${nextSection.id}`);
+        console.log(`[TRANSITION] Triggered transition from ${this.stage.sections[this.currentAreaIndex].id} to ${nextSection.id} at playerX=${this.player.x}`);
         this.mapTransition.transitionToArea(nextSection.id, (nextAreaId) => {
-          console.log(`[TRANSITION] Executing callback for: ${nextAreaId}`);
           this.unloadArea();
           this.loadArea(nextAreaId);
-          console.log(`[TRANSITION] Area loaded: ${nextAreaId}, new currentAreaIndex: ${this.currentAreaIndex}`);
+          console.log(`[TRANSITION] Area transition complete: now in ${nextAreaId}`);
         });
-        return;
       }
     }
 
